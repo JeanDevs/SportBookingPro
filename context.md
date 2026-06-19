@@ -5,10 +5,10 @@
 
 ## Estado actual
 
-- **Fase:** `3-development` (Auth — código completo, falta E2E/config con Supabase real). Arquitectura: ver D-002.
-- **Último avance:** FASE 3 Auth COMPLETA en código ✅. Implementado por Executors + Verifier: mock retirado; `@supabase/ssr` con sesión en cookies httpOnly (CERO localStorage); backend valida JWT + `GET /auth/me`; trigger `handle_new_user` auto-provisiona `public.users`; páginas login/signup/forgot-password + flujo de reset cerrado (route handler `/callback` con `exchangeCodeForSession` PKCE + página `/update-password` + server action `updatePassword`). Typecheck web+api limpio, api tests 3/3. Evals en `06-evaluations/`.
-- **Próxima tarea (requiere Jean — necesita claves/acceso Supabase):** (1) cargar claves Supabase locales y E2E signup→login→dashboard→logout + reset password, (2) aplicar migración `20260619000100_auth_user_provisioning.sql` en Supabase, (3) configurar Redirect URL `${APP_URL}/callback` en el dashboard de Supabase Auth. Luego FASE 4 (Gestión de Canchas).
-- **Bloqueadores:** ninguno en código. Lo pendiente requiere claves Supabase reales (no disponibles en este entorno).
+- **Fase:** `3-complete` (Auth — E2E verificado con Supabase real 2026-06-19). Arquitectura: ver D-002.
+- **Último avance:** FASE 3 Auth 100% COMPLETA ✅. E2E verificado: signup → email de confirmación → login → dashboard → logout → reset password con nueva contraseña. Migración `20260619000100` aplicada en remoto, trigger `handle_new_user` confirmado en `public.users`. Typecheck web+api limpio, api tests 3/3.
+- **Próxima tarea (requiere Jean):** FASE 4 — Gestión de Canchas (pendiente aprobación).
+- **Bloqueadores / Pendientes de seguridad:** contraseña visible en plaintext en el payload de red (Network tab) al hacer login y reset password — investigar si es GET en lugar de POST, logging indebido, o simplemente Network tab normal (body POST encriptado en tránsito). Resolver antes de producción.
 
 ## Stack / Tecnologías
 
