@@ -1,0 +1,21 @@
+{
+  "name": "app-deporte",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SaaS multi-tenant para gestión de canchas deportivas.",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @app-deporte/web --filter @app-deporte/api dev",
+    "dev:web": "pnpm --filter @app-deporte/web dev",
+    "dev:api": "pnpm --filter @app-deporte/api dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
+
