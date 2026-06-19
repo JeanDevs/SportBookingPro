@@ -6,8 +6,8 @@
 ## Estado actual
 
 - **Fase:** `4-development` (Gestión de Canchas — aprobada y planificada 2026-06-19). Arquitectura: ver D-002.
-- **Último avance:** FASE 3 Auth 100% COMPLETA ✅ (E2E real verificado). FASE 4 aprobada y planificada. Decisiones de implementación tomadas por Jean (ver abajo).
-- **Próxima tarea:** Ejecutar plan FASE 4 — capa de servicios (facilities + fields), gate de onboarding (crear complejo), CRUD UI de canchas, tour guiado driver.js. Pendiente: arrancar ejecución subtarea por subtarea.
+- **Último avance:** FASE 4 subt. 2 y 3 implementadas (typecheck web limpio). (2) Capa de servicios: `services/facilities.ts` (getMyFacility, createFacility, updateFacility) + `services/fields.ts` (listFields, createField, updateField, setFieldStatus). (3) Gate de onboarding: `middleware.ts` redirige a `/onboarding` a todo propietario autenticado sin complejo, y desde `/onboarding` al panel si ya lo tiene + página `app/onboarding/page.tsx`.
+- **Próxima tarea:** FASE 4 subt. 4 (CRUD UI de canchas en `/fields`, reemplazar data hardcoded) y subt. 5 (tour driver.js). Subt. 6: E2E + verificación RLS al cierre.
 - **Bloqueadores:** Ninguno. (Cerrado: la "contraseña en payload" NO era bug — `signIn`/`updatePassword` son Next.js Server Actions `'use server'`; el POST que se ve en Network es el body de la Server Action hacia el servidor Next, no un fetch del cliente a Supabase. Viaja sobre TLS en prod; el servidor no loguea credenciales. Sin código que corregir.)
 
 ### Decisiones FASE 4 (Jean, 2026-06-19)
