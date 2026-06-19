@@ -26,7 +26,7 @@
 - **Entidades principales:** `users`, `facilities`, `fields`, `customers`, `reservations`, `payments` (+ soporte: disponibilidad, pricing, historial de estados, audit logs).
 - **Multi-tenancy crítico:** todo dato de negocio se aísla por propietario vía RLS. Un error aquí expone datos entre propietarios — riesgo alto.
 - **Anti-solapamiento de reservas** ya resuelto en BD vía constraint de exclusión; falta probar concurrencia.
-- Código de `apps/api/src` y `packages/shared/src` es mayormente scaffold (`.gitkeep`). Lo único con lógica real hoy: `apps/api/src/main.ts` (servidor demo con `/health` y `/auth/login` mock).
+- `apps/api/src`: módulo `auth` completo (domain/application/infrastructure/presentation) + cliente service-role Supabase en `shared/infrastructure`. Mock `/auth/login` retirado. `packages/shared/src` sigue como scaffold (`.gitkeep`).
 
 ## Decisiones abiertas (pendientes de Jean)
 
