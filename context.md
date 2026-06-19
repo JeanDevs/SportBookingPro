@@ -5,10 +5,10 @@
 
 ## Estado actual
 
-- **Fase:** `3-development` (entrando) — scaffold y modelo de datos completos; siguiente módulo: Autenticación
-- **Último avance:** Modelo de datos generado localmente (migración `20260611000100_initial_business_schema.sql` + `docs/database/DATA_MODEL.md`). Prototipo UI estático de todas las pantallas MVP. Baseline OWASP creado.
-- **Próxima tarea:** Decisión de Jean — (A) retomar validación de FASE 2 en Supabase, o (B) arrancar FASE 3 Autenticación (registro, login, logout, recuperación, perfil en `public.users`, integración Supabase Auth). Antes de ambas: revisar con Jean si los prototipos UI representan la operación real.
-- **Bloqueadores:** Validación del modelo de datos en Supabase está **pausada por decisión de Jean**. No avanzar a FASE 3 sin aprobación explícita (ver "Regla de Continuidad" en `PROJECT_STATE.md`).
+- **Fase:** `3-development` (listo para Auth) — FASE 2 ✅ COMPLETADA. Schema validada en Supabase remoto.
+- **Último avance:** Migración aplicada en Supabase ✅. Tareas 1-5 validadas ✅: RLS multi-tenant, anti-solapamiento GIST, granularidad 30min, triggers, constraints. Listo para FASE 3.
+- **Próxima tarea:** FASE 3 — Autenticación: (1) Integrar Supabase Auth, (2) signup/login/logout en frontend Next.js, (3) perfil usuario en `public.users`, (4) session management.
+- **Bloqueadores:** ninguno.
 
 ## Stack / Tecnologías
 
