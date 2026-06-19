@@ -5,10 +5,17 @@
 
 ## Estado actual
 
-- **Fase:** `3-complete` (Auth — E2E verificado con Supabase real 2026-06-19). Arquitectura: ver D-002.
-- **Último avance:** FASE 3 Auth 100% COMPLETA ✅. E2E verificado: signup → email de confirmación → login → dashboard → logout → reset password con nueva contraseña. Migración `20260619000100` aplicada en remoto, trigger `handle_new_user` confirmado en `public.users`. Typecheck web+api limpio, api tests 3/3.
-- **Próxima tarea (requiere Jean):** FASE 4 — Gestión de Canchas (pendiente aprobación).
-- **Bloqueadores / Pendientes de seguridad:** contraseña visible en plaintext en el payload de red (Network tab) al hacer login y reset password — investigar si es GET en lugar de POST, logging indebido, o simplemente Network tab normal (body POST encriptado en tránsito). Resolver antes de producción.
+- **Fase:** `4-development` (Gestión de Canchas — aprobada y planificada 2026-06-19). Arquitectura: ver D-002.
+- **Último avance:** FASE 3 Auth 100% COMPLETA ✅ (E2E real verificado). FASE 4 aprobada y planificada. Decisiones de implementación tomadas por Jean (ver abajo).
+- **Próxima tarea:** Ejecutar plan FASE 4 — capa de servicios (facilities + fields), gate de onboarding (crear complejo), CRUD UI de canchas, tour guiado driver.js. Pendiente: arrancar ejecución subtarea por subtarea.
+- **Bloqueadores:** Ninguno. (Cerrado: la "contraseña en payload" NO era bug — `signIn`/`updatePassword` son Next.js Server Actions `'use server'`; el POST que se ve en Network es el body de la Server Action hacia el servidor Next, no un fetch del cliente a Supabase. Viaja sobre TLS en prod; el servidor no loguea credenciales. Sin código que corregir.)
+
+### Decisiones FASE 4 (Jean, 2026-06-19)
+- **Complejo (facility):** un solo complejo por propietario en el MVP (sin selector de complejo).
+- **Provisión del complejo:** onboarding manual — gate al primer ingreso sin complejo que obliga a crearlo antes de acceder a Canchas. Además, tour guiado de la UI.
+- **Librería de tour:** `driver.js` (MIT, ~5kb, sin fricción SSR). Flag de "tour visto" NO en localStorage (regla de seguridad) → persistir en DB.
+- **Soft delete de canchas:** vía enum `fields.status` (`ACTIVE`/`INACTIVE`/`MAINTENANCE`); "desactivar" = `INACTIVE`. No existe boolean `is_active` en el schema.
+- **Acceso a datos:** Server Actions `'use server'` directo a Supabase (consistente con FASE 3); RLS por `owner_id` ya protege facilities/fields. Fastify se reserva para lógica compleja (reservas/pagos).
 
 ## Stack / Tecnologías
 
