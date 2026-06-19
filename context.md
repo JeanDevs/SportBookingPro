@@ -5,10 +5,10 @@
 
 ## Estado actual
 
-- **Fase:** `3-development` (listo para Auth) — FASE 2 ✅ COMPLETADA. Schema validada en Supabase remoto.
-- **Último avance:** Migración aplicada en Supabase ✅. Tareas 1-5 validadas ✅: RLS multi-tenant, anti-solapamiento GIST, granularidad 30min, triggers, constraints. Listo para FASE 3.
-- **Próxima tarea:** FASE 3 — Autenticación: (1) Integrar Supabase Auth, (2) signup/login/logout en frontend Next.js, (3) perfil usuario en `public.users`, (4) session management.
-- **Bloqueadores:** ninguno.
+- **Fase:** `3-development` (Auth — código completo, falta E2E/config con Supabase real). Arquitectura: ver D-002.
+- **Último avance:** FASE 3 Auth COMPLETA en código ✅. Implementado por Executors + Verifier: mock retirado; `@supabase/ssr` con sesión en cookies httpOnly (CERO localStorage); backend valida JWT + `GET /auth/me`; trigger `handle_new_user` auto-provisiona `public.users`; páginas login/signup/forgot-password + flujo de reset cerrado (route handler `/callback` con `exchangeCodeForSession` PKCE + página `/update-password` + server action `updatePassword`). Typecheck web+api limpio, api tests 3/3. Evals en `06-evaluations/`.
+- **Próxima tarea (requiere Jean — necesita claves/acceso Supabase):** (1) cargar claves Supabase locales y E2E signup→login→dashboard→logout + reset password, (2) aplicar migración `20260619000100_auth_user_provisioning.sql` en Supabase, (3) configurar Redirect URL `${APP_URL}/callback` en el dashboard de Supabase Auth. Luego FASE 4 (Gestión de Canchas).
+- **Bloqueadores:** ninguno en código. Lo pendiente requiere claves Supabase reales (no disponibles en este entorno).
 
 ## Stack / Tecnologías
 

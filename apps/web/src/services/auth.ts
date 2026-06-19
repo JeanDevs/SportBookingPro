@@ -1,71 +1,110 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:3002';
+'use server';
 
-export interface LoginCredentials {
+import { redirect } from 'next/navigation';
+import type { User } from '@supabase/supabase-js';
+import { createClient } from '../lib/supabase/server';
+
+export interface AuthResult {
+  error: string | null;
+}
+
+export interface SignUpInput {
   email: string;
   password: string;
-}
-
-export interface AuthUser {
-  id: string;
-  email: string;
   fullName: string;
-  role: 'ADMIN';
 }
 
-export interface AuthResponse {
-  token: string;
-  user: AuthUser;
+/**
+ * Inicia sesion contra Supabase Auth. La sesion se persiste en cookies
+ * httpOnly por `@supabase/ssr`: nunca en localStorage/sessionStorage.
+ */
+export async function signIn(email: string, password: string): Promise<AuthResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    return { error: 'Credenciales invalidas.' };
+  }
+
+  return { error: null };
 }
 
-export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+/**
+ * Registro de propietario. `full_name` viaja en `options.data` para que el
+ * trigger de la base de datos lo recoja al crear el perfil.
+ */
+export async function signUp({ email, password, fullName }: SignUpInput): Promise<AuthResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName },
     },
-    body: JSON.stringify(credentials),
   });
 
-  if (!response.ok) {
-    const errorData = (await response.json().catch(() => null)) as { message?: string } | null;
-    throw new Error(errorData?.message ?? 'Credenciales inválidas.');
+  if (error) {
+    return { error: 'No se pudo completar el registro.' };
   }
 
-  return (await response.json()) as AuthResponse;
+  return { error: null };
 }
 
-export function saveSession(authResponse: AuthResponse) {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  localStorage.setItem('app-deporte-token', authResponse.token);
-  localStorage.setItem('app-deporte-user', JSON.stringify(authResponse.user));
+/**
+ * Cierra la sesion en Supabase (limpia la cookie httpOnly) y redirige a /login.
+ */
+export async function signOut(): Promise<never> {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect('/login');
 }
 
-export function logout() {
-  if (typeof window === 'undefined') {
-    return;
+/**
+ * Envia un email de recuperacion de contraseña.
+ */
+export async function resetPassword(email: string): Promise<AuthResult> {
+  const supabase = await createClient();
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const options = appUrl
+    ? { redirectTo: `${appUrl}/callback?next=/update-password` }
+    : undefined;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, options);
+
+  if (error) {
+    return { error: 'No se pudo enviar el email de recuperacion.' };
   }
 
-  localStorage.removeItem('app-deporte-token');
-  localStorage.removeItem('app-deporte-user');
+  return { error: null };
 }
 
-export function getStoredSession() {
-  if (typeof window === 'undefined') {
-    return null;
+/**
+ * Actualiza la contraseña del usuario autenticado. Tras el callback de
+ * recuperacion la sesion ya vive en cookies httpOnly, asi que `updateUser`
+ * opera sobre esa sesion mediante el server client.
+ */
+export async function updatePassword(newPassword: string): Promise<AuthResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+  if (error) {
+    return { error: 'No se pudo actualizar la contraseña.' };
   }
 
-  const token = localStorage.getItem('app-deporte-token');
-  const rawUser = localStorage.getItem('app-deporte-user');
+  return { error: null };
+}
 
-  if (!token || !rawUser) {
-    return null;
-  }
-
-  return {
-    token,
-    user: JSON.parse(rawUser) as AuthUser,
-  };
+/**
+ * Devuelve el usuario autenticado actual (o null) leyendo la sesion desde el
+ * server client (cookies httpOnly). Pensado para server components/actions.
+ */
+export async function getSessionUser(): Promise<User | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
 }

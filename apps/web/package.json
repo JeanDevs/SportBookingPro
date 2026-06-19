@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@app-deporte/shared": "workspace:*",
+    "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.0.0",
     "lucide-react": "^1.18.0",
     "next": "^15.0.0",

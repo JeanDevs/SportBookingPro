@@ -1,9 +1,8 @@
 'use client';
 
 import { Calendar, Users, DollarSign, Zap, Menu, Bell, LogOut, TrendingUp, Clock, CheckCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { logout } from '../services/auth';
+import { signOut } from '../services/auth';
 
 const reservations = [
   {
@@ -73,7 +72,6 @@ const stats = [
 ];
 
 export default function HomePage() {
-  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [animateStats, setAnimateStats] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -287,8 +285,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => {
-                  logout();
-                  router.push('/login');
+                  void signOut();
                 }}
                 className="flex items-center gap-3 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-105 active:scale-95 w-full px-4 py-3 text-sm"
               >
@@ -302,8 +299,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => {
-                  logout();
-                  router.push('/login');
+                  void signOut();
                 }}
                 className="flex items-center gap-3 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition-all duration-300 hover:scale-105 active:scale-95 p-3"
                 title="Salir"

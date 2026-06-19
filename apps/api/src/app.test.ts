@@ -1,11 +1,17 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import { buildApp, DEMO_ADMIN } from './app.js';
+import { buildApp } from './app.js';
 
 describe('API app-deporte', () => {
   let app: FastifyInstance;
 
   beforeAll(async () => {
+    // El cliente Supabase server-side se construye con estas envs (fail-fast).
+    // Valores dummy: no hacemos llamadas reales a Supabase en estos tests; las
+    // rutas rechazan antes de tocar la red cuando no hay token.
+    process.env.SUPABASE_URL ??= 'http://localhost:54321';
+    process.env.SUPABASE_SERVICE_ROLE_KEY ??= 'test-service-role-key';
+
     app = await buildApp();
     await app.ready();
   });
@@ -26,41 +32,24 @@ describe('API app-deporte', () => {
     });
   });
 
-  describe('POST /auth/login', () => {
-    it('devuelve token y usuario con credenciales válidas', async () => {
-      const res = await app.inject({
-        method: 'POST',
-        url: '/auth/login',
-        payload: { email: DEMO_ADMIN.email, password: DEMO_ADMIN.password },
-      });
+  describe('GET /auth/me', () => {
+    it('devuelve 401 cuando no se envía token', async () => {
+      const res = await app.inject({ method: 'GET', url: '/auth/me' });
 
-      expect(res.statusCode).toBe(200);
-      const body = res.json();
-      expect(body.token).toBe('demo-admin-token');
-      expect(body.user.role).toBe('ADMIN');
-      // El password nunca debe viajar en la respuesta.
-      expect(body.user.password).toBeUndefined();
+      expect(res.statusCode).toBe(401);
+      expect(res.json().message).toBe('No autenticado.');
     });
 
-    it('devuelve 401 con password incorrecto', async () => {
+    it('devuelve 401 cuando el header Authorization no es Bearer', async () => {
       const res = await app.inject({
-        method: 'POST',
-        url: '/auth/login',
-        payload: { email: DEMO_ADMIN.email, password: 'wrong' },
+        method: 'GET',
+        url: '/auth/me',
+        headers: { authorization: 'Basic abc123' },
       });
 
       expect(res.statusCode).toBe(401);
-      expect(res.json().message).toBe('Credenciales inválidas.');
-    });
-
-    it('devuelve 401 cuando faltan credenciales', async () => {
-      const res = await app.inject({
-        method: 'POST',
-        url: '/auth/login',
-        payload: {},
-      });
-
-      expect(res.statusCode).toBe(401);
+      // Nunca se filtran detalles internos del rechazo.
+      expect(res.json().message).toBe('No autenticado.');
     });
   });
 });

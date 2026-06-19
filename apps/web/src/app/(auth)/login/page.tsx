@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login, saveSession } from '../../../services/auth';
+import Link from 'next/link';
+import { signIn } from '../../../services/auth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,11 +18,15 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const authResponse = await login({ email, password });
-      saveSession(authResponse);
+      const result = await signIn(email, password);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
       router.push('/');
-    } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : 'No se pudo iniciar sesión.');
+      router.refresh();
+    } catch {
+      setError('No se pudo iniciar sesion.');
     } finally {
       setLoading(false);
     }
@@ -52,12 +57,13 @@ export default function LoginPage() {
 
           <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
             <label className="block">
-              <span className="text-sm font-semibold text-[#4b5565]">Usuario demo</span>
+              <span className="text-sm font-semibold text-[#4b5565]">Email</span>
               <input
                 className="mt-2 w-full rounded-md border border-[#c9d2df] px-3 py-2 outline-none focus:border-[#143d2c]"
-                placeholder="admin"
-                type="text"
-                autoComplete="username"
+                placeholder="tucorreo@ejemplo.com"
+                type="email"
+                autoComplete="email"
+                required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
               />
@@ -67,9 +73,10 @@ export default function LoginPage() {
               <span className="text-sm font-semibold text-[#4b5565]">Password</span>
               <input
                 className="mt-2 w-full rounded-md border border-[#c9d2df] px-3 py-2 outline-none focus:border-[#143d2c]"
-                placeholder="admin123"
+                placeholder="Tu contraseña"
                 type="password"
                 autoComplete="current-password"
+                required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
               />
@@ -85,6 +92,15 @@ export default function LoginPage() {
               {loading ? 'Ingresando...' : 'Entrar'}
             </button>
           </form>
+
+          <div className="mt-4 flex items-center justify-between text-sm">
+            <Link className="font-semibold text-[#143d2c] hover:underline" href="/forgot-password">
+              Olvide mi contraseña
+            </Link>
+            <Link className="font-semibold text-[#143d2c] hover:underline" href="/signup">
+              Crear cuenta
+            </Link>
+          </div>
         </div>
       </section>
     </main>
