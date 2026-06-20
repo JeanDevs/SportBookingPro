@@ -3,6 +3,7 @@
 import { Calendar, Users, DollarSign, Zap, Menu, Bell, LogOut, TrendingUp, Clock, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from '../services/auth';
+import { OnboardingTour } from './onboarding-tour';
 
 const reservations = [
   {
@@ -117,6 +118,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
+      <OnboardingTour />
       <style>{`
         @keyframes slideInLeft {
           from {
@@ -230,7 +232,7 @@ export default function HomePage() {
           </div>
 
           {sidebarOpen && (
-            <nav className="space-y-2 animate-fade-in block" style={{ animationDelay: '0.2s' }}>
+            <nav data-tour="sidebar" className="space-y-2 animate-fade-in block" style={{ animationDelay: '0.2s' }}>
               {[
                 { label: "Dashboard", href: "/", active: true, icon: '📊' },
                 { label: "Reservas", href: "/reservas", active: false, icon: '📅' },
@@ -242,6 +244,7 @@ export default function HomePage() {
                 <a
                   key={label}
                   href={href}
+                  data-tour={label === 'Canchas' ? 'nav-canchas' : undefined}
                   className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-all duration-300 group ${
                     active
                       ? "bg-blue-100 text-blue-700 font-semibold shadow-sm"
@@ -347,7 +350,7 @@ export default function HomePage() {
                 <button className="hidden sm:inline-block rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 hover:scale-105 active:scale-95">
                   <a href="/reservas">Ver calendario</a>
                 </button>
-                <button className="rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
+                <button data-tour="nueva-reserva" className="rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
                   Nueva reserva
                 </button>
               </div>

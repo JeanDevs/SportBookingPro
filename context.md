@@ -6,8 +6,8 @@
 ## Estado actual
 
 - **Fase:** `4-development` (Gestión de Canchas — aprobada y planificada 2026-06-19). Arquitectura: ver D-002.
-- **Último avance:** FASE 4 subt. 2 y 3 implementadas (typecheck web limpio). (2) Capa de servicios: `services/facilities.ts` (getMyFacility, createFacility, updateFacility) + `services/fields.ts` (listFields, createField, updateField, setFieldStatus). (3) Gate de onboarding: `middleware.ts` redirige a `/onboarding` a todo propietario autenticado sin complejo, y desde `/onboarding` al panel si ya lo tiene + página `app/onboarding/page.tsx`.
-- **Próxima tarea:** FASE 4 subt. 4 (CRUD UI de canchas en `/fields`, reemplazar data hardcoded) y subt. 5 (tour driver.js). Subt. 6: E2E + verificación RLS al cierre.
+- **Último avance:** FASE 4 subt. 2–5 implementadas. Typecheck web limpio + `next build` OK (15/15 páginas). (2) Servicios facilities/fields. (3) Gate de onboarding en middleware + página. (4) CRUD UI de canchas: `fields/page.tsx` ahora server component (SSR vía RLS) + `fields/fields-view.tsx` client (grid, modal crear/editar, acciones ACTIVE/INACTIVE/MAINTENANCE, empty state). (5) Tour guiado driver.js 1.4.0: `app/onboarding-tour.tsx` disparado por `?tour=1` tras onboarding (sin localStorage; param efímero, se limpia al arrancar), anclado en el dashboard (`data-tour` en sidebar/Canchas/Nueva reserva).
+- **Próxima tarea:** FASE 4 subt. 6 — E2E en navegador con usuario real (signup→gate→complejo→tour→crear/editar/desactivar cancha) + prueba RLS entre dos propietarios. Requiere servidores levantados + Jean (como en FASE 3).
 - **Bloqueadores:** Ninguno. (Cerrado: la "contraseña en payload" NO era bug — `signIn`/`updatePassword` son Next.js Server Actions `'use server'`; el POST que se ve en Network es el body de la Server Action hacia el servidor Next, no un fetch del cliente a Supabase. Viaja sobre TLS en prod; el servidor no loguea credenciales. Sin código que corregir.)
 
 ### Decisiones FASE 4 (Jean, 2026-06-19)

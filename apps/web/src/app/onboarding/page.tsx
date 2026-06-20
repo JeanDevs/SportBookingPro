@@ -29,7 +29,8 @@ export default function OnboardingPage() {
         return;
       }
       // El complejo ya existe: el middleware permitira el acceso al panel.
-      router.push('/');
+      // `?tour=1` dispara el tour guiado de bienvenida una sola vez.
+      router.push('/?tour=1');
       router.refresh();
     } catch {
       setError('No se pudo crear el complejo.');
