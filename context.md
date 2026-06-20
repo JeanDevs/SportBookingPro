@@ -5,10 +5,11 @@
 
 ## Estado actual
 
-- **Fase:** `4-development` (Gestión de Canchas — aprobada y planificada 2026-06-19). Arquitectura: ver D-002.
-- **Último avance:** FASE 4 subt. 2–5 implementadas. Typecheck web limpio + `next build` OK (15/15 páginas). (2) Servicios facilities/fields. (3) Gate de onboarding en middleware + página. (4) CRUD UI de canchas: `fields/page.tsx` ahora server component (SSR vía RLS) + `fields/fields-view.tsx` client (grid, modal crear/editar, acciones ACTIVE/INACTIVE/MAINTENANCE, empty state). (5) Tour guiado driver.js 1.4.0: `app/onboarding-tour.tsx` disparado por `?tour=1` tras onboarding (sin localStorage; param efímero, se limpia al arrancar), anclado en el dashboard (`data-tour` en sidebar/Canchas/Nueva reserva).
-- **Próxima tarea:** FASE 4 subt. 6 — E2E en navegador con usuario real (signup→gate→complejo→tour→crear/editar/desactivar cancha) + prueba RLS entre dos propietarios. Requiere servidores levantados + Jean (como en FASE 3).
-- **Bloqueadores:** Ninguno. (Cerrado: la "contraseña en payload" NO era bug — `signIn`/`updatePassword` son Next.js Server Actions `'use server'`; el POST que se ve en Network es el body de la Server Action hacia el servidor Next, no un fetch del cliente a Supabase. Viaja sobre TLS en prod; el servidor no loguea credenciales. Sin código que corregir.)
+- **Fase:** `5-development` (Gestión de Clientes — aprobada 2026-06-19). Arquitectura: ver D-002.
+- **Último avance:** FASE 5 (Gestión de Clientes) **implementada en código** (typecheck + `next build` OK, 16 rutas). Decisión Jean: soft delete vía `is_active`. Creados: migración `20260619000200_customers_soft_delete.sql`, `services/customers.ts` (listCustomers/createCustomer/updateCustomer/setCustomerActive), UI `customers/page.tsx` (server) + `customers-view.tsx` (tabla real, búsqueda nombre/teléfono, modal crear/editar, archivar). Se quitaron campos inexistentes del prototipo (email/visits/totalSpent/status VIP). FASE 4 implementada previamente (subt. 2–5).
+- **Próxima tarea:** Aplicar migración `20260619000200` en remoto (`supabase db push` — requiere autorización de Jean; puede pedir desbloqueo de IP + `SUPABASE_DB_PASSWORD`, como en FASE 3). Sin ella, `listCustomers` no devuelve datos (columna `is_active` ausente). Luego verificación E2E de clientes.
+- **Bloqueadores:** Migración de FASE 5 pendiente de aplicar en remoto (bloquea la prueba funcional de Clientes, no el resto del código).
+- **Deuda de verificación (pendiente, no bloquea FASE 5):** FASE 4 subt. 6 — E2E en navegador (signup→gate→complejo→tour→CRUD cancha) + prueba RLS entre dos propietarios. Jean decidió dejarlo pendiente y avanzar. Retomar antes de deploy (FASE de hardening). El código de FASE 4 compila y construye; falta la validación funcional en navegador.
 
 ### Decisiones FASE 4 (Jean, 2026-06-19)
 - **Complejo (facility):** un solo complejo por propietario en el MVP (sin selector de complejo).

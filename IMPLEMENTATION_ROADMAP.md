@@ -117,16 +117,15 @@ Validar:
 
 ## Autenticación
 
-Estado actual de implementación:
+Estado: COMPLETADA (2026-06-19). E2E verificado con Supabase real.
 
-- [x] Endpoint base de login disponible en `/auth/login`.
-- [x] Formulario de login conectado al endpoint.
-- [x] Credenciales demo: `admin` / `admin123`.
+Implementación final (reemplaza el prototipo demo `admin`/`admin123`):
 
-Pendiente para aprobación:
-
-- [ ] Validar flujo completo en UI.
-- [ ] Confirmar cierre de sesión y persistencia de sesión.
+- [x] Registro, Login, Logout y Recuperación de contraseña vía Supabase Auth.
+- [x] Arquitectura `@supabase/ssr` con sesión SOLO en cookies httpOnly (cero localStorage) — ver D-002.
+- [x] Provisión automática de `public.users` por trigger `handle_new_user` (migración `20260619000100`).
+- [x] Middleware protege todas las rutas de negocio; redirige a `/login` sin sesión.
+- [x] E2E real: signup → confirmación de email → login → dashboard → logout → reset password.
 
 Objetivo:
 
@@ -150,6 +149,18 @@ No implementar otros módulos.
 # FASE 4
 
 ## Gestión de Canchas
+
+Estado: IMPLEMENTADA (2026-06-19). Verificación E2E en navegador pendiente (deuda; ver `context.md`).
+
+Decisiones (Jean): un complejo por propietario; onboarding manual (gate) + tour guiado
+(driver.js); soft delete vía enum `fields.status` (`INACTIVE`); acceso por Server Actions + RLS.
+
+- [x] Crear cancha (nombre, tipo, tarifa).
+- [x] Editar cancha.
+- [x] Desactivar cancha (status `INACTIVE`; también `MAINTENANCE`).
+- [x] Listar canchas (SSR aislado por RLS).
+- [x] Gate de onboarding: crear complejo antes de acceder + tour de bienvenida.
+- [ ] Verificación E2E en navegador + RLS entre dos propietarios.
 
 Objetivo:
 
