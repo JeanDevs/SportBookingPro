@@ -21,7 +21,7 @@ export default function SettingsPage() {
         {/* Sidebar */}
         <aside className="hidden lg:block bg-white border-r border-gray-200 px-6 py-8 sticky top-0 h-screen">
           <div className="mb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">⚽ APP DEPORTE</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-600">⚽ APP DEPORTE</p>
             <h1 className="mt-2 text-2xl font-bold text-gray-900">La Bombonera</h1>
           </div>
           <nav className="space-y-2">
@@ -37,7 +37,7 @@ export default function SettingsPage() {
                 key={label}
                 href={href}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 ${
-                  active ? "bg-blue-100 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-100"
+                  active ? "bg-brand-100 text-brand-700 font-semibold" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
                 {icon} {label}
@@ -56,7 +56,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleSave}
                 className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95 ${
-                  saved ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700'
+                  saved ? 'bg-green-600' : 'bg-brand-600 hover:bg-brand-700'
                 }`}
               >
                 <Save size={16} />
@@ -83,7 +83,7 @@ export default function SettingsPage() {
                       onClick={() => setActiveSection(section)}
                       className={`w-full flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all text-left ${
                         activeSection === section
-                          ? 'bg-blue-100 text-blue-700 font-semibold'
+                          ? 'bg-brand-100 text-brand-700 font-semibold'
                           : 'text-gray-600 hover:bg-gray-100'
                       }`}
                     >
@@ -106,7 +106,7 @@ export default function SettingsPage() {
                           <input
                             type="text"
                             defaultValue="La Bombonera"
-                            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors"
+                            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500 transition-colors"
                           />
                         </div>
                         <div>
@@ -114,7 +114,7 @@ export default function SettingsPage() {
                           <input
                             type="text"
                             defaultValue="Av. Deportiva 456, Lima"
-                            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500"
                           />
                         </div>
                         <div className="grid gap-4 md:grid-cols-2">
@@ -123,7 +123,7 @@ export default function SettingsPage() {
                             <input
                               type="tel"
                               defaultValue="01 234 5678"
-                              className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                              className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500"
                             />
                           </div>
                           <div>
@@ -131,13 +131,13 @@ export default function SettingsPage() {
                             <input
                               type="tel"
                               defaultValue="999 123 456"
-                              className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500"
+                              className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500"
                             />
                           </div>
                         </div>
                         <div>
                           <label className="block text-sm font-semibold text-gray-700 mb-1.5">Zona horaria</label>
-                          <select className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500 bg-white">
+                          <select className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500 bg-white">
                             <option>America/Lima (UTC-5)</option>
                             <option>America/Bogota (UTC-5)</option>
                           </select>
@@ -154,11 +154,11 @@ export default function SettingsPage() {
                       <div className="grid gap-4 md:grid-cols-2">
                         <div>
                           <label className="block text-sm font-semibold text-gray-700 mb-1.5">Apertura</label>
-                          <input type="time" defaultValue="07:00" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500" />
+                          <input type="time" defaultValue="07:00" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500" />
                         </div>
                         <div>
                           <label className="block text-sm font-semibold text-gray-700 mb-1.5">Cierre</label>
-                          <input type="time" defaultValue="23:00" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500" />
+                          <input type="time" defaultValue="23:00" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500" />
                         </div>
                       </div>
                       <div>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
                               key={min}
                               className={`flex-1 rounded-lg py-2.5 text-sm font-semibold border transition-all ${
                                 min === 30
-                                  ? 'bg-blue-600 text-white border-blue-600'
+                                  ? 'bg-brand-600 text-white border-brand-600'
                                   : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                               }`}
                             >
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                             <button
                               key={day}
                               className={`w-10 h-10 rounded-lg text-sm font-semibold border transition-all ${
-                                i < 6 ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+                                i < 6 ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
                               }`}
                             >
                               {day}
@@ -205,14 +205,14 @@ export default function SettingsPage() {
                         { name: "Yape", detail: "Número: 999 123 456", enabled: true, color: "bg-purple-100 text-purple-700" },
                         { name: "Plin", detail: "Número: 999 123 456", enabled: true, color: "bg-sky-100 text-sky-700" },
                         { name: "Efectivo", detail: "Sin configuración adicional", enabled: true, color: "bg-green-100 text-green-700" },
-                        { name: "Transferencia bancaria", detail: "BCP Cta. 123-456-789", enabled: false, color: "bg-blue-100 text-blue-700" }
+                        { name: "Transferencia bancaria", detail: "BCP Cta. 123-456-789", enabled: false, color: "bg-brand-100 text-brand-700" }
                       ].map(({ name, detail, enabled, color }) => (
                         <div key={name} className="flex items-center justify-between p-4 rounded-lg border border-gray-200 bg-gray-50">
                           <div className="flex items-center gap-3">
                             <span className={`rounded-full px-3 py-1 text-xs font-bold ${color}`}>{name}</span>
                             <p className="text-sm text-gray-600">{detail}</p>
                           </div>
-                          <div className={`relative inline-flex h-6 w-11 cursor-pointer rounded-full transition-colors duration-200 ${enabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                          <div className={`relative inline-flex h-6 w-11 cursor-pointer rounded-full transition-colors duration-200 ${enabled ? 'bg-brand-600' : 'bg-gray-300'}`}>
                             <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 mt-0.5 ${enabled ? 'translate-x-5 ml-0.5' : 'translate-x-0.5'}`} />
                           </div>
                         </div>
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                       <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                         <label className="block text-sm font-semibold text-gray-700 mb-1.5">% mínimo de adelanto</label>
                         <div className="flex items-center gap-3">
-                          <input type="number" defaultValue={30} min={0} max={100} className="w-24 rounded-lg border border-gray-200 px-4 py-2 text-sm outline-none focus:border-blue-500" />
+                          <input type="number" defaultValue={30} min={0} max={100} className="w-24 rounded-lg border border-gray-200 px-4 py-2 text-sm outline-none focus:border-brand-500" />
                           <span className="text-sm text-gray-600">% del total para confirmar reserva</span>
                         </div>
                       </div>
@@ -241,7 +241,7 @@ export default function SettingsPage() {
                       ].map(({ label, enabled }) => (
                         <div key={label} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                           <span className="text-sm text-gray-700">{label}</span>
-                          <div className={`relative inline-flex h-6 w-11 cursor-pointer rounded-full transition-colors ${enabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                          <div className={`relative inline-flex h-6 w-11 cursor-pointer rounded-full transition-colors ${enabled ? 'bg-brand-600' : 'bg-gray-300'}`}>
                             <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform mt-0.5 ${enabled ? 'translate-x-5 ml-0.5' : 'translate-x-0.5'}`} />
                           </div>
                         </div>
@@ -257,17 +257,17 @@ export default function SettingsPage() {
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-semibold text-gray-700 mb-1.5">Contraseña actual</label>
-                          <input type="password" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500" />
+                          <input type="password" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500" />
                         </div>
                         <div>
                           <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nueva contraseña</label>
-                          <input type="password" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500" />
+                          <input type="password" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500" />
                         </div>
                         <div>
                           <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirmar nueva contraseña</label>
-                          <input type="password" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-blue-500" />
+                          <input type="password" className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-brand-500" />
                         </div>
-                        <button className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 text-sm font-semibold transition-all hover:scale-105">
+                        <button className="rounded-lg bg-brand-600 hover:bg-brand-700 text-white px-6 py-2.5 text-sm font-semibold transition-all hover:scale-105">
                           Actualizar contraseña
                         </button>
                       </div>

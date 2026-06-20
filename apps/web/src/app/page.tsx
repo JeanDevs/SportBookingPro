@@ -3,6 +3,7 @@
 import { Calendar, Users, DollarSign, Zap, Menu, Bell, LogOut, TrendingUp, Clock, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { signOut } from '../services/auth';
+import { getMyFacility } from '../services/facilities';
 import { OnboardingTour } from './onboarding-tour';
 
 const reservations = [
@@ -21,8 +22,8 @@ const reservations = [
     customer: "Equipo Las Bravas",
     status: "Adelanto",
     amount: "S/ 45",
-    statusColor: "bg-blue-100 text-blue-800",
-    statusBg: "from-blue-400 to-blue-500"
+    statusColor: "bg-brand-100 text-brand-800",
+    statusBg: "from-brand-400 to-brand-500"
   },
   {
     time: "19:00",
@@ -47,7 +48,7 @@ const stats = [
     value: "18",
     detail: "+4 vs ayer",
     icon: Calendar,
-    color: "from-blue-500 to-blue-600"
+    color: "from-brand-500 to-brand-600"
   },
   {
     label: "Ingresos mes",
@@ -74,12 +75,20 @@ const stats = [
 
 export default function HomePage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [animateStats, setAnimateStats] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [facilityName, setFacilityName] = useState('Mi complejo');
 
   useEffect(() => {
-    const timer = setTimeout(() => setAnimateStats(true), 100);
-    return () => clearTimeout(timer);
+    // Nombre real del complejo (server action; RLS lo limita al del propietario).
+    let active = true;
+    getMyFacility().then((facility) => {
+      if (active && facility) {
+        setFacilityName(facility.name);
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -207,10 +216,10 @@ export default function HomePage() {
             {sidebarOpen ? (
               <>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-brand-600">
                     ⚽ APP DEPORTE
                   </p>
-                  <h1 className="mt-2 text-2xl font-bold text-gray-900">La Bombonera</h1>
+                  <h1 className="mt-2 text-2xl font-bold text-gray-900">{facilityName}</h1>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
@@ -247,7 +256,7 @@ export default function HomePage() {
                   data-tour={label === 'Canchas' ? 'nav-canchas' : undefined}
                   className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-all duration-300 group ${
                     active
-                      ? "bg-blue-100 text-blue-700 font-semibold shadow-sm"
+                      ? "bg-brand-100 text-brand-700 font-semibold shadow-sm"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                 >
@@ -273,7 +282,7 @@ export default function HomePage() {
                   title={label}
                   className={`flex items-center gap-3 rounded-lg lg:px-2 lg:py-3 lg:text-xs lg:justify-center transition-all duration-300 group ${
                     active
-                      ? "bg-blue-100 text-blue-700 font-semibold shadow-sm"
+                      ? "bg-brand-100 text-brand-700 font-semibold shadow-sm"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                 >
@@ -344,13 +353,13 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-3">
                 <button className="rounded-lg p-2 hover:bg-gray-100 transition-all duration-300 relative group hover:scale-110 active:scale-95">
-                  <Bell size={20} className="text-gray-600 group-hover:text-blue-600 transition-colors" />
+                  <Bell size={20} className="text-gray-600 group-hover:text-brand-600 transition-colors" />
                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                 </button>
-                <button className="hidden sm:inline-block rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 hover:scale-105 active:scale-95">
+                <button className="hidden sm:inline-block rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50 transition-all duration-300 hover:scale-105 active:scale-95">
                   <a href="/reservas">Ver calendario</a>
                 </button>
-                <button data-tour="nueva-reserva" className="rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
+                <button data-tour="nueva-reserva" className="rounded-lg bg-brand-600 hover:bg-brand-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
                   Nueva reserva
                 </button>
               </div>
@@ -377,7 +386,7 @@ export default function HomePage() {
                         <Icon size={20} />
                       </div>
                     </div>
-                    <p className="mt-4 text-3xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{value}</p>
+                    <p className="mt-4 text-3xl font-bold text-gray-900 group-hover:text-brand-600 transition-colors">{value}</p>
                     <p className="mt-2 text-xs font-semibold text-gray-500 group-hover:text-gray-700 transition-colors flex items-center gap-1">
                       <TrendingUp size={14} className={`${value.includes('+') ? 'text-green-600' : 'text-gray-400'}`} />
                       {detail}
@@ -393,7 +402,7 @@ export default function HomePage() {
               <div className="lg:col-span-2 rounded-xl bg-white p-7 shadow-sm border border-gray-200 animate-slide-in-left" style={{ animationDelay: '0.5s' }}>
                 <div className="mb-6 flex items-center justify-between">
                   <h3 className="text-lg font-bold text-gray-900">Próximas reservas</h3>
-                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 animate-pulse-subtle">
+                  <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700 animate-pulse-subtle">
                     ⏱️ 30 min
                   </span>
                 </div>
@@ -401,29 +410,29 @@ export default function HomePage() {
                   {reservations.map((reservation, idx) => (
                     <div
                       key={`${reservation.time}-${reservation.field}`}
-                      className={`reservation-item flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 hover:scale-102 hover:shadow-md group cursor-pointer`}
+                      className={`reservation-item flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4 hover:bg-brand-50 hover:border-brand-300 transition-all duration-300 hover:scale-102 hover:shadow-md group cursor-pointer`}
                       style={{ animationDelay: `${0.5 + idx * 0.1}s` }}
                     >
                       <div className="flex items-center gap-4 flex-1">
-                        <div className={`rounded-lg bg-blue-600 px-3 py-2 text-center font-bold text-white group-hover:shadow-lg group-hover:shadow-blue-600/50 transition-all`}>
+                        <div className={`rounded-lg bg-brand-600 px-3 py-2 text-center font-bold text-white group-hover:shadow-lg group-hover:shadow-brand-600/50 transition-all`}>
                           <p className="text-sm">{reservation.time}</p>
                         </div>
                         <div className="flex-1">
-                          <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{reservation.field}</p>
+                          <p className="font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">{reservation.field}</p>
                           <p className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors">{reservation.customer}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
                           reservation.status === 'Confirmada' ? 'bg-green-100 text-green-700' :
-                          reservation.status === 'Adelanto' ? 'bg-blue-100 text-blue-700' :
+                          reservation.status === 'Adelanto' ? 'bg-brand-100 text-brand-700' :
                           'bg-amber-100 text-amber-700'
                         } transition-all shadow-sm`}>
                           {reservation.status === 'Confirmada' && <CheckCircle size={14} className="inline mr-1" />}
                           {reservation.status === 'Adelanto' && <Clock size={14} className="inline mr-1" />}
                           {reservation.status}
                         </span>
-                        <p className="font-bold text-gray-900 w-16 text-right group-hover:text-blue-600 transition-colors">{reservation.amount}</p>
+                        <p className="font-bold text-gray-900 w-16 text-right group-hover:text-brand-600 transition-colors">{reservation.amount}</p>
                       </div>
                     </div>
                   ))}
@@ -438,7 +447,7 @@ export default function HomePage() {
                     <div key={field.name} className="group cursor-pointer">
                       <div className="mb-3 flex items-center justify-between group-hover:translate-x-1 transition-transform">
                         <div>
-                          <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{field.name}</p>
+                          <p className="font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">{field.name}</p>
                           <p className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors">{field.status}</p>
                         </div>
                         <span className="text-sm font-bold text-gray-900">{field.occupancy}%</span>

@@ -16,11 +16,11 @@ const methodColors: Record<string, string> = {
   Yape: "bg-purple-100 text-purple-700",
   Plin: "bg-sky-100 text-sky-700",
   Efectivo: "bg-green-100 text-green-700",
-  Transferencia: "bg-blue-100 text-blue-700"
+  Transferencia: "bg-brand-100 text-brand-700"
 };
 
 const avatarColors = [
-  "bg-blue-500", "bg-green-500", "bg-purple-500",
+  "bg-brand-500", "bg-green-500", "bg-purple-500",
   "bg-orange-500", "bg-pink-500", "bg-cyan-500"
 ];
 
@@ -43,7 +43,7 @@ export default function PaymentsPage() {
         {/* Sidebar */}
         <aside className="hidden lg:block bg-white border-r border-gray-200 px-6 py-8 sticky top-0 h-screen">
           <div className="mb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">⚽ APP DEPORTE</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-600">⚽ APP DEPORTE</p>
             <h1 className="mt-2 text-2xl font-bold text-gray-900">La Bombonera</h1>
           </div>
           <nav className="space-y-2">
@@ -59,7 +59,7 @@ export default function PaymentsPage() {
                 key={label}
                 href={href}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 ${
-                  active ? "bg-blue-100 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-100"
+                  active ? "bg-brand-100 text-brand-700 font-semibold" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
                 {icon} {label}
@@ -91,7 +91,7 @@ export default function PaymentsPage() {
               </div>
               <div className="rounded-xl bg-white p-5 border border-gray-200 shadow-sm">
                 <p className="text-sm text-gray-500">Ingresos mes</p>
-                <p className="text-2xl font-bold text-blue-600 mt-1">S/ 7,840</p>
+                <p className="text-2xl font-bold text-brand-600 mt-1">S/ 7,840</p>
                 <p className="text-xs text-gray-500 mt-1">72% cobrado</p>
               </div>
               <div className="rounded-xl bg-amber-50 p-5 border border-amber-200 shadow-sm">
@@ -138,7 +138,7 @@ export default function PaymentsPage() {
                   placeholder="Buscar por cliente o ID..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 bg-white text-sm outline-none focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 bg-white text-sm outline-none focus:border-brand-500"
                 />
               </div>
               <div className="flex gap-2">
@@ -148,7 +148,7 @@ export default function PaymentsPage() {
                     onClick={() => setFilter(f)}
                     className={`px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${
                       filter === f
-                        ? 'bg-blue-600 text-white shadow-sm'
+                        ? 'bg-brand-600 text-white shadow-sm'
                         : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
@@ -218,7 +218,7 @@ export default function PaymentsPage() {
                 { method: "Yape", amount: "S/ 180", count: 2, color: "bg-purple-100 text-purple-700 border-purple-200" },
                 { method: "Plin", amount: "S/ 45", count: 1, color: "bg-sky-100 text-sky-700 border-sky-200" },
                 { method: "Efectivo", amount: "S/ 340", count: 2, color: "bg-green-100 text-green-700 border-green-200" },
-                { method: "Transferencia", amount: "S/ 80", count: 1, color: "bg-blue-100 text-blue-700 border-blue-200" }
+                { method: "Transferencia", amount: "S/ 80", count: 1, color: "bg-brand-100 text-brand-700 border-brand-200" }
               ].map(({ method, amount, count, color }) => (
                 <div key={method} className={`rounded-xl p-4 border ${color}`}>
                   <p className="font-bold">{method}</p>

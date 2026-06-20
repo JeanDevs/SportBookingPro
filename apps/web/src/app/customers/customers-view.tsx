@@ -26,7 +26,7 @@ const NAV_ITEMS = [
 ];
 
 const AVATAR_COLORS = [
-  'bg-blue-500',
+  'bg-brand-500',
   'bg-green-500',
   'bg-purple-500',
   'bg-orange-500',
@@ -134,7 +134,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
         {/* Sidebar */}
         <aside className="hidden lg:block bg-white border-r border-gray-200 px-6 py-8 sticky top-0 h-screen">
           <div className="mb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-600">
               ⚽ APP DEPORTE
             </p>
             <h1 className="mt-2 text-2xl font-bold text-gray-900">{facilityName}</h1>
@@ -146,7 +146,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
                 href={href}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-300 ${
                   href === '/customers'
-                    ? 'bg-blue-100 text-blue-700 font-semibold'
+                    ? 'bg-brand-100 text-brand-700 font-semibold'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -176,7 +176,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
               <button
                 type="button"
                 onClick={openCreate}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-blue-700"
+                className="flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-700"
               >
                 <Plus size={16} /> Nuevo cliente
               </button>
@@ -195,7 +195,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
                 placeholder="Buscar por nombre o teléfono..."
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                className="w-full rounded-lg border border-gray-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition-colors focus:border-blue-500"
+                className="w-full rounded-lg border border-gray-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition-colors focus:border-brand-500"
               />
             </div>
 
@@ -209,7 +209,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
                 <button
                   type="button"
                   onClick={openCreate}
-                  className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-blue-700"
+                  className="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-brand-700"
                 >
                   <Plus size={16} /> Crear primer cliente
                 </button>
@@ -231,7 +231,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
                   </thead>
                   <tbody>
                     {filtered.map((customer, idx) => (
-                      <tr key={customer.id} className="border-b border-gray-100 hover:bg-blue-50">
+                      <tr key={customer.id} className="border-b border-gray-100 hover:bg-brand-50">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div
@@ -256,7 +256,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
                               type="button"
                               onClick={() => openEdit(customer)}
                               disabled={isPending}
-                              className="flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 transition-all hover:bg-blue-100 disabled:opacity-50"
+                              className="flex items-center gap-1 rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-600 transition-all hover:bg-brand-100 disabled:opacity-50"
                             >
                               <Edit size={14} /> Editar
                             </button>
@@ -307,7 +307,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
               <label className="block">
                 <span className="text-sm font-semibold text-gray-700">Nombre</span>
                 <input
-                  className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-blue-600"
+                  className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-brand-600"
                   placeholder="Ej. Carlos Mendoza"
                   type="text"
                   required
@@ -319,7 +319,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
               <label className="block">
                 <span className="text-sm font-semibold text-gray-700">Teléfono (opcional)</span>
                 <input
-                  className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-blue-600"
+                  className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-brand-600"
                   placeholder="Ej. 999 111 222"
                   type="tel"
                   value={form.phone}
@@ -330,7 +330,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
               <label className="block">
                 <span className="text-sm font-semibold text-gray-700">Notas (opcional)</span>
                 <textarea
-                  className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-blue-600"
+                  className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:border-brand-600"
                   placeholder="Preferencias, observaciones..."
                   rows={3}
                   value={form.notes}
@@ -354,7 +354,7 @@ export function CustomersView({ customers, facilityName }: CustomersViewProps) {
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="flex-1 rounded-md bg-blue-600 px-4 py-2.5 font-semibold text-white transition-all hover:bg-blue-700 disabled:opacity-70"
+                  className="flex-1 rounded-md bg-brand-600 px-4 py-2.5 font-semibold text-white transition-all hover:bg-brand-700 disabled:opacity-70"
                 >
                   {isPending ? 'Guardando...' : editing ? 'Guardar' : 'Crear cliente'}
                 </button>

@@ -10,6 +10,12 @@
 - **Próxima tarea:** Aplicar migración `20260619000200` en remoto (`supabase db push` — requiere autorización de Jean; puede pedir desbloqueo de IP + `SUPABASE_DB_PASSWORD`, como en FASE 3). Sin ella, `listCustomers` no devuelve datos (columna `is_active` ausente). Luego verificación E2E de clientes.
 - **Bloqueadores:** Migración de FASE 5 pendiente de aplicar en remoto (bloquea la prueba funcional de Clientes, no el resto del código).
 
+### Rediseño UI + consistencia (2026-06-19)
+- **Dashboard:** muestra el nombre real del complejo (`getMyFacility`) en vez de "La Bombonera" hardcodeado. Eliminada variable muerta `animateStats`.
+- **Reservas reestructurada:** ahora `page.tsx` (server, carga complejo) + `reservas-view.tsx` (client) con el sidebar estándar del resto de la app (azul→brand, iconos, botón **Salir** que faltaba) + vistas Día/Semana y panel de reserva. Datos de muestra (lógica real = FASE 6).
+- **Tema "Pitch Green" (vía `/theme-factory`, custom):** identidad deportiva verde que unifica auth (ya verde) con el resto (antes azul). Escala `brand` en `tailwind.config.ts`; tipografía Inter (cuerpo) + Sora (títulos) con `next/font`; `globals.css` actualizado. Reemplazado `blue-*`→`brand-*` en las 6 pantallas de la app (0 azules residuales).
+- **Verificación:** typecheck + `next build` OK (15/15), 26 tests verdes, dev server sano en `localhost:3000`.
+
 ### Auditoría QA + tests (2026-06-19)
 - **Corregido:** enlaces rotos `#` en el sidebar de `/reservas` (Canchas/Clientes/Pagos/Configuración) → rutas reales. Eliminado `page_backup.tsx` (código muerto, dashboard viejo con los mismos enlaces rotos).
 - **Tests añadidos (26 en total, todos verdes):** API `extract-token.test.ts` (15 — parsing de Bearer/cookies Supabase, seguridad de auth) + Web vitest configurado con `validators.test.ts` (8). Validaciones puras extraídas a `services/validators.ts` (DRY, testeable). Typecheck + build web OK.
