@@ -7,8 +7,8 @@
 
 - **Fase:** `5-development` (Gestión de Clientes — aprobada 2026-06-19). Arquitectura: ver D-002.
 - **Último avance:** FASE 5 (Gestión de Clientes) **implementada en código** (typecheck + `next build` OK, 16 rutas). Decisión Jean: soft delete vía `is_active`. Creados: migración `20260619000200_customers_soft_delete.sql`, `services/customers.ts` (listCustomers/createCustomer/updateCustomer/setCustomerActive), UI `customers/page.tsx` (server) + `customers-view.tsx` (tabla real, búsqueda nombre/teléfono, modal crear/editar, archivar). Se quitaron campos inexistentes del prototipo (email/visits/totalSpent/status VIP). FASE 4 implementada previamente (subt. 2–5).
-- **Próxima tarea:** Aplicar migración `20260619000200` en remoto (`supabase db push` — requiere autorización de Jean; puede pedir desbloqueo de IP + `SUPABASE_DB_PASSWORD`, como en FASE 3). Sin ella, `listCustomers` no devuelve datos (columna `is_active` ausente). Luego verificación E2E de clientes.
-- **Bloqueadores:** Migración de FASE 5 pendiente de aplicar en remoto (bloquea la prueba funcional de Clientes, no el resto del código).
+- **Próxima tarea:** Verificación E2E de Clientes en navegador (crear/listar/buscar/archivar). FASE 5 funcionalmente desbloqueada.
+- **Bloqueadores:** Ninguno. (Migración `20260619000200` de FASE 5 **aplicada en remoto** 2026-06-19 vía `supabase db push`. Diagnóstico del "no guarda clientes": el insert SÍ funcionaba — había 2 clientes en la BD — pero `listCustomers` filtraba por `is_active` inexistente y devolvía []. Con la columna creada, guardar/listar/buscar/soft-delete operan. Sin cambios de código.)
 
 ### Rediseño UI + consistencia (2026-06-19)
 - **Dashboard:** muestra el nombre real del complejo (`getMyFacility`) en vez de "La Bombonera" hardcodeado. Eliminada variable muerta `animateStats`.
