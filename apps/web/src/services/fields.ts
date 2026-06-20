@@ -2,6 +2,7 @@
 
 import { createClient } from '../lib/supabase/server';
 import { getMyFacility } from './facilities';
+import { validateFieldInput } from './validators';
 
 /**
  * Capa de acceso a `fields` (canchas) del complejo del propietario.
@@ -70,19 +71,6 @@ function mapRow(row: FieldRow): Field {
     pricePerHour: Number(row.price_per_hour),
     status: row.status,
   };
-}
-
-function validateFieldInput(input: UpdateFieldInput): string | null {
-  if (input.name !== undefined && !input.name.trim()) {
-    return 'El nombre de la cancha es obligatorio.';
-  }
-  if (
-    input.pricePerHour !== undefined &&
-    (!Number.isFinite(input.pricePerHour) || input.pricePerHour < 0)
-  ) {
-    return 'La tarifa por hora debe ser un numero mayor o igual a 0.';
-  }
-  return null;
 }
 
 /**

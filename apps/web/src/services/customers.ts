@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '../lib/supabase/server';
+import { validateCustomerName } from './validators';
 
 /**
  * Capa de acceso a `customers` (clientes del propietario).
@@ -88,10 +89,11 @@ export async function createCustomer({
   phone,
   notes,
 }: CreateCustomerInput): Promise<CustomerResult> {
-  const trimmedName = name.trim();
-  if (!trimmedName) {
-    return { error: 'El nombre del cliente es obligatorio.' };
+  const nameError = validateCustomerName(name);
+  if (nameError) {
+    return { error: nameError };
   }
+  const trimmedName = name.trim();
 
   const supabase = await createClient();
 
@@ -131,11 +133,11 @@ export async function updateCustomer(
   const patch: Record<string, string | null> = {};
 
   if (input.name !== undefined) {
-    const trimmedName = input.name.trim();
-    if (!trimmedName) {
-      return { error: 'El nombre del cliente es obligatorio.' };
+    const nameError = validateCustomerName(input.name);
+    if (nameError) {
+      return { error: nameError };
     }
-    patch.name = trimmedName;
+    patch.name = input.name.trim();
   }
   if (input.phone !== undefined) {
     patch.phone = input.phone.trim() || null;

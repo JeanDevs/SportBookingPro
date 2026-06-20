@@ -115,10 +115,10 @@ export default function ReservationsPage() {
             {[
               ["Dashboard", "/"],
               ["Reservas", "/reservas"],
-              ["Canchas", "#"],
-              ["Clientes", "#"],
-              ["Pagos", "#"],
-              ["Configuracion", "#"]
+              ["Canchas", "/fields"],
+              ["Clientes", "/customers"],
+              ["Pagos", "/payments"],
+              ["Configuracion", "/settings"]
             ].map(([item, href]) => (
               <a
                 className={`block rounded-md px-3 py-2 ${
