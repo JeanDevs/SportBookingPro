@@ -93,6 +93,18 @@ Recomendado en remoto (Auth → dashboard): activar **leaked-password protection
 confirmación de correo en prod, `enable_confirmations`. Hardening pendiente: bucket `payment-proofs`
 con URLs firmadas en vez de público.
 
+### Auto-expiración de reservas (pg_cron) — ACTIVO ✅
+El sweep `expire_stale_intents()` corre **cada minuto** vía pg_cron (migración `000500`), así el
+marketplace libera horarios vencidos sin esperar a que alguien reserve. Supervisión:
+```sql
+select * from cron.job where jobname='expire-stale-intents';
+select status, return_message, start_time from cron.job_run_details
+  where jobid=(select jobid from cron.job where jobname='expire-stale-intents')
+  order by start_time desc limit 10;
+```
+Para pausarlo: `select cron.unschedule('expire-stale-intents');`. Si algún día no rinde, la
+alternativa es una ruta cron en Vercel (`/api/cron/expire-intents` con service role) — no necesaria hoy.
+
 Después, en remoto:
 - Auth → Email: si quieres confirmación de correo, déjala activa (local la tiene apagada para iterar).
 - Comprueba advisors: `npx supabase` o el MCP `get_advisors` (security/perf) tras el push.
