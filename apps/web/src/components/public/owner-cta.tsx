@@ -5,18 +5,18 @@ import { buttonClasses } from "@/components/ui/button";
 const BENEFITS = [
   {
     icon: CalendarCheck,
-    title: "Llena tus horas muertas",
-    desc: "Recibe reservas online 24/7, no solo por WhatsApp o llamadas.",
+    title: "Monetiza tu capacidad ociosa",
+    desc: "Convierte tus horas muertas en ingresos. Recibe reservas online 24/7, sin depender de WhatsApp.",
   },
   {
     icon: Wallet,
-    title: "Asegura cada reserva",
-    desc: "Cobra el adelanto por Yape/Plin antes de jugar y reduce las ausencias.",
+    title: "Cobra adelantos garantizados",
+    desc: "Sin ausencias, sin sorpresas, sin riesgo. Recibe el pago antes de que jueguen.",
   },
   {
     icon: TrendingUp,
-    title: "Controla tu negocio",
-    desc: "Reservas, pagos y clientes en un panel hecho para dueños de canchas.",
+    title: "Gana más cada mes",
+    desc: "Controla cada sol que entra. Panel simple diseñado para maximizar tus ingresos.",
   },
 ];
 
@@ -31,12 +31,18 @@ export function OwnerCta() {
               Para dueños de complejos
             </span>
             <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-ink-50 sm:text-4xl">
-              ¿Tienes un complejo? <span className="text-lime-400">Publícalo gratis</span> y llena
-              tus canchas.
+              Convierte tus <span className="text-lime-400">horas muertas</span> en ingresos
             </h2>
-            <p className="mt-4 max-w-lg text-ink-300">
-              Empieza sin costo. Tus clientes reservan y pagan el adelanto online; tú validas y
-              gestionas todo desde un panel simple.
+            <p className="mt-3 max-w-lg text-sm font-semibold text-lime-300">
+              Gratis para publicar • Gana en cada reserva • Sin comisión oculta
+            </p>
+            <div className="mt-5 rounded-2xl border border-lime-400/30 bg-lime-400/10 p-4">
+              <p className="text-sm text-ink-100">
+                💰 <span className="font-semibold">Propietarios promedian S/. 5,000/mes</span> monetizando sus horas ociosas
+              </p>
+            </div>
+            <p className="mt-6 max-w-lg text-ink-300">
+              Empieza sin costo. Tus clientes reservan y pagan adelantos online. Tú validas, gestionas y cobras todo desde un panel.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/panel/registro" className={buttonClasses({ size: "lg" })}>

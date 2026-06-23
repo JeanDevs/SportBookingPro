@@ -6,6 +6,7 @@ import { SiteHeader, SiteFooter } from "@/components/public/site-header";
 import { AmenityChips } from "@/components/public/amenity-chips";
 import { limaDateInput } from "@/lib/format";
 import { BookingView } from "./booking-view";
+import { LoginModalContainer } from "./login-modal-container";
 
 export default async function FacilityPage({
   params,
@@ -21,6 +22,9 @@ export default async function FacilityPage({
   return (
     <>
       <SiteHeader />
+      {/* Show LoginModal if user is not logged in */}
+      {!user && <LoginModalContainer facilityName={facility.name} facilityId={facility.id} />}
+
       <section className="relative overflow-hidden border-b border-ink-800">
         <div className="absolute inset-0 bg-lime-radial opacity-70" />
         <div className="relative mx-auto max-w-6xl px-5 py-12 sm:px-8">
@@ -48,6 +52,7 @@ export default async function FacilityPage({
 
       <BookingView
         slug={facility.slug}
+        facilityId={facility.id}
         facilityName={facility.name}
         depositPercentage={facility.depositPercentage}
         fields={facility.fields}

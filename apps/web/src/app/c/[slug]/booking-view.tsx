@@ -3,16 +3,18 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Minus, Plus, Loader2, CalendarX2, CheckCircle2 } from "lucide-react";
-import { getFieldSlots, type PublicField, type Slot } from "@/services/public-catalog";
+import { Minus, Plus, Loader2, CalendarX2, CheckCircle2, Zap, TrendingUp } from "lucide-react";
+import { getFieldSlots, getRecentReservationCount, type PublicField, type Slot } from "@/services/public-catalog";
 import { createBooking } from "@/services/customer-bookings";
 import { Button, Alert } from "@/components/ui";
 import { formatPEN, formatLimaTime, formatLimaDateLong } from "@/lib/format";
 import { fieldTypeMeta } from "@/lib/domain";
 import { maxConsecutiveSlots } from "@/lib/slots";
+import { trackBookingStarted } from "@/lib/analytics";
 
 interface BookingViewProps {
   slug: string;
+  facilityId: string;
   facilityName: string;
   depositPercentage: number;
   fields: PublicField[];
@@ -28,6 +30,7 @@ function shiftDate(dateStr: string, days: number): string {
 
 export function BookingView({
   slug,
+  facilityId,
   facilityName,
   depositPercentage,
   fields,
@@ -43,7 +46,9 @@ export function BookingView({
   const [durationSlots, setDurationSlots] = useState(2);
   const [error, setError] = useState("");
   const [isBooking, startBooking] = useTransition();
+  const [recentReservations, setRecentReservations] = useState<number | null>(null);
 
+  // Load slots for selected field/date
   useEffect(() => {
     if (!fieldId) return;
     let active = true;
@@ -62,6 +67,19 @@ export function BookingView({
     };
   }, [fieldId, date]);
 
+  // Load recent reservation count for trust signal (once on mount)
+  useEffect(() => {
+    if (recentReservations !== null) return; // Already loaded
+    let active = true;
+    getRecentReservationCount(facilityId)
+      .then((count) => {
+        if (active) setRecentReservations(count);
+      });
+    return () => {
+      active = false;
+    };
+  }, [facilityId, recentReservations]);
+
   const days = useMemo(
     () => Array.from({ length: 7 }, (_, i) => shiftDate(today, i)),
     [today],
@@ -77,6 +95,10 @@ export function BookingView({
     setStartIdx(idx);
     setDurationSlots(Math.min(2, maxConsecutiveSlots(slots, idx)));
     setError("");
+    // Track booking start
+    if (!isLoggedIn) {
+      trackBookingStarted(fieldId, date, 1);
+    }
   };
 
   const reserve = () => {
@@ -107,9 +129,31 @@ export function BookingView({
     );
   }
 
+  // Calculate available slots for scarcity messaging
+  const availableCount = slots.filter((s) => s.available).length;
+  const showScarcity = availableCount <= 2 && availableCount > 0;
+
   return (
     <div className="mx-auto grid max-w-6xl gap-6 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_340px]">
       <div>
+        {/* Login CTA - show BEFORE slot selection if not logged in */}
+        {!isLoggedIn && (
+          <div className="mb-6 rounded-2xl border border-lime-400/40 bg-lime-400/5 p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="font-semibold text-lime-200">¿Primera vez reservando?</p>
+                <p className="mt-1 text-sm text-ink-400">Inicia sesión para asegurar tu hora con adelanto seguro</p>
+              </div>
+              <Link
+                href={`/ingresar?next=${encodeURIComponent(`/c/${slug}`)}`}
+                className="flex-shrink-0 rounded-xl bg-lime-400 px-4 py-2.5 font-semibold text-ink-950 transition hover:bg-lime-300"
+              >
+                Inicia sesión
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Canchas */}
         <h2 className="font-display text-lg font-semibold text-ink-50">Elige tu cancha</h2>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -207,6 +251,29 @@ export function BookingView({
           <h3 className="font-display text-lg font-semibold text-ink-50">Tu reserva</h3>
           <p className="mt-1 text-sm text-ink-400">{facilityName}</p>
 
+          {/* Trust signals */}
+          <div className="mt-4 space-y-2">
+            {/* Recently booked indicator */}
+            {recentReservations !== null && recentReservations > 0 && (
+              <div className="flex items-center gap-2 rounded-lg border border-lime-400/30 bg-lime-400/5 px-3 py-2">
+                <TrendingUp size={14} className="text-lime-400" />
+                <span className="text-xs text-lime-200">
+                  {recentReservations} reserva{recentReservations === 1 ? "" : "s"} en las últimas 48h
+                </span>
+              </div>
+            )}
+
+            {/* Scarcity indicator */}
+            {showScarcity && (
+              <div className="flex items-center gap-2 rounded-lg border border-amber-400/30 bg-amber-400/5 px-3 py-2">
+                <Zap size={14} className="text-amber-400" />
+                <span className="text-xs text-amber-200">
+                  Solo {availableCount} horario{availableCount === 1 ? "" : "s"} disponible{availableCount === 1 ? "" : "s"}
+                </span>
+              </div>
+            )}
+          </div>
+
           {startIdx != null && covered.length > 0 ? (
             <>
               <div className="mt-4 rounded-xl border border-ink-700 bg-ink-900/60 p-4">
@@ -276,6 +343,14 @@ export function BookingView({
                 <CheckCircle2 size={13} className="text-lime-400" />
                 Aseguras tu horario enviando el adelanto.
               </p>
+
+              {/* Security badge */}
+              <div className="mt-4 border-t border-ink-800 pt-4">
+                <p className="text-center text-xs text-ink-400">
+                  <CheckCircle2 size={13} className="mb-0.5 inline text-lime-400" />
+                  {" Pago seguro con Yape/Plin"}
+                </p>
+              </div>
             </>
           ) : (
             <p className="mt-4 text-sm text-ink-400">

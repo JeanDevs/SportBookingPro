@@ -104,3 +104,16 @@ export async function getFieldSlots(fieldId: string, date: string): Promise<Slot
     available: Boolean(s.available),
   }));
 }
+
+/**
+ * Get count of reservations for a facility in the last 48 hours.
+ * Used for trust signals in booking flow.
+ */
+export async function getRecentReservationCount(facilityId: string): Promise<number> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('public_recent_reservations_count', {
+    p_facility_id: facilityId,
+  });
+  if (error || !data) return 0;
+  return Number(data) || 0;
+}
