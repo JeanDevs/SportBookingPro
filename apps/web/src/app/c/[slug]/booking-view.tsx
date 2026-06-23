@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Minus, Plus, Loader2, CalendarX2, CheckCircle2, Zap, TrendingUp } from "lucide-react";
+import { Minus, Plus, Loader2, CalendarX2, CheckCircle2, Zap, TrendingUp, Clock, Mail } from "lucide-react";
 import { getFieldSlots, getRecentReservationCount, type PublicField, type Slot } from "@/services/public-catalog";
 import { createBooking } from "@/services/customer-bookings";
 import { Button, Alert } from "@/components/ui";
@@ -11,6 +11,7 @@ import { formatPEN, formatLimaTime, formatLimaDateLong } from "@/lib/format";
 import { fieldTypeMeta } from "@/lib/domain";
 import { maxConsecutiveSlots } from "@/lib/slots";
 import { trackBookingStarted } from "@/lib/analytics";
+import { BookingProgress } from "@/components/public/booking-progress";
 
 interface BookingViewProps {
   slug: string;
@@ -133,9 +134,15 @@ export function BookingView({
   const availableCount = slots.filter((s) => s.available).length;
   const showScarcity = availableCount <= 2 && availableCount > 0;
 
+  // Progress step: 1 = choosing, 2 = slot selected / reviewing, 3 = booking in progress/done
+  const currentStep = isBooking ? 3 : startIdx !== null && covered.length > 0 ? 2 : 1;
+
   return (
     <div className="mx-auto grid max-w-6xl gap-6 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_340px]">
       <div>
+        {/* Booking progress stepper */}
+        <BookingProgress currentStep={currentStep} />
+
         {/* Login CTA - show BEFORE slot selection if not logged in */}
         {!isLoggedIn && (
           <div className="mb-6 rounded-2xl border border-lime-400/40 bg-lime-400/5 p-5 shadow-sm">
@@ -343,6 +350,25 @@ export function BookingView({
                 <CheckCircle2 size={13} className="text-lime-400" />
                 Aseguras tu horario enviando el adelanto.
               </p>
+
+              {/* What happens next */}
+              <div className="mt-4 border-t border-ink-800 pt-4">
+                <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-ink-500">¿Qué pasa después?</p>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 size={13} className="mt-0.5 shrink-0 text-lime-400" />
+                    <span className="text-xs text-ink-400">Confirmas el adelanto por Yape/Plin</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Clock size={13} className="mt-0.5 shrink-0 text-lime-400" />
+                    <span className="text-xs text-ink-400">El dueño confirma en menos de 2 horas</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Mail size={13} className="mt-0.5 shrink-0 text-lime-400" />
+                    <span className="text-xs text-ink-400">Recibes confirmación y llegas 5 min antes</span>
+                  </div>
+                </div>
+              </div>
 
               {/* Security badge */}
               <div className="mt-4 border-t border-ink-800 pt-4">
