@@ -8,12 +8,12 @@ security definer
 set search_path = public
 stable
 as $$
-  select count(br.id)::bigint
-  from public.bookings br
-  join public.fields fl on fl.id = br.field_id
+  select count(res.id)::bigint
+  from public.reservations res
+  join public.fields fl on fl.id = res.field_id
   where fl.facility_id = p_facility_id
-    and br.created_at > now() - interval '48 hours'
-    and br.status in ('CONFIRMED', 'PAID', 'IN_USE');
+    and res.created_at > now() - interval '48 hours'
+    and res.status in ('CONFIRMED', 'PAID', 'COMPLETED');
 $$;
 
 grant execute on function public.public_recent_reservations_count(uuid) to anon, authenticated;
