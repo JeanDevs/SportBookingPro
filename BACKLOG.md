@@ -91,6 +91,32 @@ Este backlog organiza el trabajo del MVP de APP DEPORTE. Según `AGENTS.md`, est
 - [x] **C1** — Amenities por complejo (catálogo cerrado: techada, estacionamiento, vestuarios,
       duchas, iluminación, cafetín, WiFi, seguridad) → owner las marca y se muestran en tarjeta + ficha.
 
+### Bugs detectados (P1 — corregir antes de mostrar a clientes)
+- [ ] **B-4 — El registro de cliente cae en el panel del dueño (`/panel`).**
+  - **Síntoma (reportado por Jean):** un cliente que se registra para reservar termina en
+    el panel admin de "El Aguila Calva" en vez de `/cuenta`.
+  - **Causa raíz:** el alta de cliente no garantiza que la sesión resultante sea
+    `account_type=customer` antes de redirigir, y el middleware manda a `/panel` a cualquier
+    no-cliente que toque `/cuenta`:
+    1. `registro/page.tsx` hace `router.push('/cuenta')` sin verificar que `signUp` dejó
+       sesión de cliente; `signUpCustomer` solo devuelve `{ error }`.
+    2. Si había sesión de dueño activa en el navegador (probar como dueño de El Aguila Calva)
+       o si la confirmación de email está ON (`signUp` → `session: null`), la sesión vigente
+       sigue siendo la del dueño → el middleware ve `account_type=owner`.
+    3. `middleware.ts` zona `/cuenta`: `if (accountType !== 'customer') redirectTo('/panel')`
+       + default `?? 'owner'` (línea 53) → lo deposita en el panel del dueño.
+  - **Fix propuesto (no aplicado):**
+    - `signUpCustomer`: `await supabase.auth.signOut()` antes del `signUp` (limpia sesión
+      previa) y devolver si quedó sesión de cliente (`data.session` / `account_type`).
+    - `registro/page.tsx`: si no hay sesión de cliente (confirmación ON), enviar a
+      `/ingresar?next=/cuenta` con aviso "revisa tu correo", no a `/cuenta`.
+    - `middleware.ts`: el rebote de no-cliente en `/cuenta` debe ir a `/` (público), nunca a
+      `/panel`; revisar el default `?? 'owner'` usado para routing.
+    - Verificar el toggle de confirmación de email en Supabase Auth y fijar la UX acorde.
+  - **Repro:** logueado como dueño de El Aguila Calva → ir a `/registro` → crear cuenta de cliente.
+  - **Verificación al cerrar:** alta en navegador limpio → `/cuenta`; alta con sesión de dueño
+    activa → no termina en `/panel`. (El trigger ya está OK por E2E: crea `customer_accounts`.)
+
 ### Diferido (P2 — decidido con Jean)
 - [ ] **A1** — Minibuscador + filtros por Distrito y Deporte en el marketplace (client-side).
 - [ ] **A2** — Filtro por disponibilidad fecha/hora (RPC `public_search_availability`). Cuando haya volumen.
