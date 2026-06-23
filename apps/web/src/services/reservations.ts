@@ -184,6 +184,17 @@ export async function createReservation(
   const depositPct = Number(facility?.deposit_percentage ?? 30);
   const deposit = Math.round((total * depositPct) / 100 * 100) / 100;
 
+  // B-1: liberar intenciones vencidas de esta cancha antes de insertar, para que
+  // el constraint GiST coincida con lo que se muestra como disponible. RLS limita
+  // el update a reservas del propietario (la cancha es suya).
+  await supabase
+    .from('reservations')
+    .update({ status: 'EXPIRED' })
+    .eq('field_id', fieldId)
+    .in('status', ['INTENT_CREATED', 'AWAITING_DEPOSIT'])
+    .not('expires_at', 'is', null)
+    .lte('expires_at', new Date().toISOString());
+
   const { error } = await supabase.from('reservations').insert({
     owner_id: user.id,
     facility_id: field.facility_id,

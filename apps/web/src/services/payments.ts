@@ -135,11 +135,41 @@ export async function validatePayment(paymentId: string): Promise<{ error: strin
 
 export async function rejectPayment(paymentId: string): Promise<{ error: string | null }> {
   const supabase = await createClient();
+
+  const { data: payment } = await supabase
+    .from('payments')
+    .select('reservation_id')
+    .eq('id', paymentId)
+    .maybeSingle();
+
   const { error } = await supabase
     .from('payments')
     .update({ status: 'REJECTED' })
     .eq('id', paymentId);
   if (error) return { error: 'No se pudo rechazar el pago.' };
+
+  // B-2: submit_proof había congelado la expiración (expires_at=null). Al rechazar,
+  // re-armamos el hold para que la reserva no bloquee el horario para siempre: o el
+  // cliente reenvía comprobante a tiempo, o la intención expira y libera la cancha.
+  const reservationId = payment?.reservation_id as string | undefined;
+  if (reservationId) {
+    const { data: res } = await supabase
+      .from('reservations')
+      .select('facility_id, status')
+      .eq('id', reservationId)
+      .maybeSingle();
+    if (res && res.status === 'AWAITING_DEPOSIT') {
+      const { data: fac } = await supabase
+        .from('facilities')
+        .select('reservation_intent_hold_minutes')
+        .eq('id', res.facility_id as string)
+        .maybeSingle();
+      const holdMin = Number(fac?.reservation_intent_hold_minutes ?? 5);
+      const newExpiry = new Date(Date.now() + holdMin * 60_000).toISOString();
+      await supabase.from('reservations').update({ expires_at: newExpiry }).eq('id', reservationId);
+    }
+  }
+
   return { error: null };
 }
 

@@ -101,6 +101,8 @@ export const RPC_ERROR_MESSAGES: Record<string, string> = {
   FIELD_UNAVAILABLE: "La cancha ya no está disponible.",
   FACILITY_UNAVAILABLE: "El complejo ya no está disponible.",
   SLOT_TAKEN: "Ese horario acaba de ser reservado. Elige otro.",
+  SLOT_IN_PAST: "Ese horario ya pasó. Elige uno futuro.",
+  INVALID_RANGE: "El rango de horas no es válido.",
   RESERVATION_NOT_FOUND: "No encontramos la reserva.",
   FORBIDDEN: "No puedes operar sobre esta reserva.",
   INVALID_STATE: "La reserva no admite esta acción.",
