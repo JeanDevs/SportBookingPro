@@ -3,11 +3,12 @@
 Guía operativa de la evolución 2.0 (marketplace de clientes + panel del dueño, rediseño dark
 premium). Rama: **`develop`**. Arquitectura: ver [ADR-003](adr/ADR-003-app-deporte-2.0.md).
 
-> **Estado de esta entrega (decisión de Jean: "todo preparado, nada aplicado"):**
-> Nada se aplicó en remoto. Migraciones, seed, código y este runbook quedan listos. El único
-> bloqueador para correr local fue el **engine de Docker** (Docker Desktop estaba abierto pero su
-> distro WSL `docker-desktop` no levantó sin interacción). En cuanto Docker responda, los 2
-> comandos del paso 1 dejan la demo corriendo.
+> **Estado de esta entrega (actualizado):** Jean pidió "no es necesario Docker, sigue", así que
+> el esquema 2.0 se **aplicó y verificó en el Supabase remoto** (`mudrcioyideyfcuphlvn`) con 3
+> migraciones (`20260623000100/000200/000300`). `apps/web/.env.local` **apunta a remoto**, por lo
+> que `pnpm --filter @app-deporte/web dev` corre la app **sin Docker** contra datos reales. El
+> complejo real "El Aguila Calva" quedó publicado (reversible) con horarios para que la demo tenga
+> datos. El stack local con Docker (§1) queda como alternativa documentada.
 
 ---
 
@@ -22,9 +23,23 @@ Pendiente (necesita el stack local): E2E en navegador con datos reales (paso 1).
 
 ---
 
-## 1. Correr local (objetivo de esta entrega)
+## 1A. Correr contra remoto (recomendado — sin Docker, datos reales)
+
+El esquema 2.0 ya está aplicado en remoto y `apps/web/.env.local` ya apunta ahí:
+
+```bash
+cd "C:/Users/JeanTS/Documents/PROYECTOS_APPS/APP DEPORTE"
+pnpm --filter @app-deporte/web dev   # → http://localhost:3000
+```
+
+- Cliente: `/` muestra "El Aguila Calva" → reserva en `/c/el-aguila-calva-a35829` (regístrate, reserva, sube adelanto en `/cuenta`).
+- Dueño: `/panel` (inicia sesión con tu cuenta de dueño real) → valida el adelanto en `/panel/pagos`.
+- Para ocultar el complejo otra vez: `/panel/configuracion` → Sitio público → desactivar.
+
+## 1B. Correr local con Docker (alternativa, datos demo aislados)
 
 Requisitos: Docker Desktop **corriendo** (engine activo — el ícono en verde), Node ≥ 20, pnpm 9.
+Cambia `apps/web/.env.local` a las claves locales (ver `.env.local.remote.bak` para volver).
 
 ```bash
 # 1) Levanta el stack Supabase local + aplica migraciones + corre el seed de demo
@@ -64,17 +79,19 @@ Si `supabase status` muestra un **anon key** distinto al de `apps/web/.env.local
 
 ---
 
-## 2. Aplicar el esquema 2.0 en **remoto** (cuando decidas)
+## 2. Esquema 2.0 en **remoto** — YA APLICADO ✅
 
-La 2.0 añade UNA migración aditiva: `supabase/migrations/20260623000100_v2_customer_marketplace.sql`
-(tabla `customer_accounts`, `facilities.slug/is_published`, `customers.customer_account_id`, RPCs
-`SECURITY DEFINER`, bucket `payment-proofs`, routing de `handle_new_user`). **No** altera la RLS del dueño.
+Aplicado y verificado el 2026-06-23 (3 migraciones, history alineada). **No** altera la RLS del dueño.
+Un `supabase db push` ahora es un no-op. Si re-creas el link:
 
 ```bash
-# Vincula (una vez) y empuja SOLO la migración nueva (el seed NO se aplica en remoto)
 npx supabase link --project-ref mudrcioyideyfcuphlvn
-npx supabase db push
+npx supabase db push   # no-op: 000100/000200/000300 ya están aplicadas
 ```
+
+Recomendado en remoto (Auth → dashboard): activar **leaked-password protection** y, si quieres
+confirmación de correo en prod, `enable_confirmations`. Hardening pendiente: bucket `payment-proofs`
+con URLs firmadas en vez de público.
 
 Después, en remoto:
 - Auth → Email: si quieres confirmación de correo, déjala activa (local la tiene apagada para iterar).
