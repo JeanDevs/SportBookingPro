@@ -2,16 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * APP DEPORTE 2.0 — base "Night Pitch" (dark premium).
+ * Lienzo casi-negro, texto claro, foco verde-lima de alto contraste.
+ */
 :root {
-  color-scheme: light;
-  font-family:
-    var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-}
-
-/* Títulos con la fuente display (Sora) del tema Pitch Green. */
-h1, h2, h3 {
-  font-family: var(--font-display), var(--font-sans), ui-sans-serif, sans-serif;
+  color-scheme: dark;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-sans);
 }
 
 * {
@@ -20,17 +18,66 @@ h1, h2, h3 {
 
 html {
   min-width: 320px;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
+  font-family: var(--font-sans);
+  background-color: #06090c;
+  color: #dde3ea;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-button,
-a {
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+a,
+button {
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
     color 160ms ease,
-    transform 160ms ease;
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+/* Foco accesible y on-brand */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid #9ee80f;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Inputs date/time/number en dark */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  cursor: pointer;
+}
+
+/* Scrollbar sutil */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f2830;
+  border-radius: 999px;
+  border: 2px solid #06090c;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2a343d;
+}
+
+::selection {
+  background: rgba(158, 232, 15, 0.3);
+  color: #f3ffd9;
 }

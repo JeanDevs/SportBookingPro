@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 
 /**
- * Tipografía del tema "Pitch Green": Inter para cuerpo (legible en tablas y
- * formularios) y Sora para títulos/marca (geométrica, con carácter deportivo).
- * Se exponen como CSS variables que consume Tailwind (fontFamily.sans/display).
+ * Tipografía 2.0: Inter (cuerpo, legible en tablas/formularios) + Sora
+ * (display/marca, geométrica con carácter deportivo). Se exponen como CSS
+ * variables que consumen Tailwind (`font-sans` / `font-display`) y `globals.css`.
  */
 const inter = Inter({
   subsets: ["latin"],
@@ -19,9 +20,13 @@ const sora = Sora({
   display: "swap",
 });
 
-export const metadata = {
-  title: "APP DEPORTE",
-  description: "Gestion de canchas, reservas, clientes y pagos."
+export const metadata: Metadata = {
+  title: {
+    default: "APP DEPORTE — Reserva tu cancha",
+    template: "%s · APP DEPORTE",
+  },
+  description:
+    "Reserva canchas deportivas en segundos y gestiona tu complejo: reservas, pagos y clientes en un solo lugar.",
 };
 
 type RootLayoutProps = {
@@ -31,7 +36,7 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="es" className={`${inter.variable} ${sora.variable}`}>
-      <body>{children}</body>
+      <body className="bg-ink-950 text-ink-100 antialiased">{children}</body>
     </html>
   );
 }

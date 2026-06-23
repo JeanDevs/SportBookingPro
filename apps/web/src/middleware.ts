@@ -4,34 +4,27 @@ import { NextResponse, type NextRequest } from 'next/server';
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
 /**
- * Rutas publicas de autenticacion (no requieren sesion).
+ * Middleware de 3 zonas (ADR-003):
+ *  - PÚBLICO  : `/`, `/c/*`, callbacks y páginas de auth (sin sesión).
+ *  - CLIENTE  : `/cuenta*` exige sesión con `account_type=customer`.
+ *  - DUEÑO    : `/panel*` exige `account_type=owner` + gate de complejo.
+ * La sesión vive SOLO en cookies httpOnly. El tipo de cuenta se lee del JWT
+ * (`user_metadata.account_type`), sin query extra.
  */
-const PUBLIC_AUTH_ROUTES = [
-  '/login',
-  '/signup',
-  '/forgot-password',
-  '/callback',
-  '/update-password',
+
+const OWNER_AUTH_PAGES = [
+  '/panel/ingresar',
+  '/panel/registro',
+  '/panel/recuperar',
+  '/panel/actualizar-clave',
 ];
+const CUSTOMER_AUTH_PAGES = ['/ingresar', '/registro', '/recuperar', '/actualizar-clave'];
 
-/**
- * Ruta del gate de onboarding: requiere sesion pero NO requiere complejo (es
- * justo donde el propietario lo crea). Se excluye del chequeo de complejo para
- * no entrar en un bucle de redireccion.
- */
-const ONBOARDING_ROUTE = '/onboarding';
-
-/**
- * Refresca la sesion en cada request (patron oficial de `@supabase/ssr`) y
- * protege las rutas de negocio. Si no hay usuario autenticado, redirige a
- * `/login`. La sesion vive SOLO en cookies httpOnly.
- */
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
   if (!supabaseUrl || !supabaseAnonKey) {
     return supabaseResponse;
   }
@@ -53,61 +46,63 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // IMPORTANTE: getUser() refresca el token si hace falta y revalida la sesion.
-  // No coloques logica entre createServerClient y getUser.
+  // No coloques lógica entre createServerClient y getUser (refresca el token).
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const accountType = (user?.user_metadata?.account_type as string | undefined) ?? 'owner';
 
   const { pathname } = request.nextUrl;
-  const isPublicAuthRoute = PUBLIC_AUTH_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
-  );
 
-  if (!user && !isPublicAuthRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/login';
-    return NextResponse.redirect(redirectUrl);
-  }
+  const redirectTo = (path: string) => {
+    const url = request.nextUrl.clone();
+    url.pathname = path;
+    url.search = '';
+    const res = NextResponse.redirect(url);
+    for (const cookie of supabaseResponse.cookies.getAll()) {
+      res.cookies.set(cookie);
+    }
+    return res;
+  };
 
-  // Gate de onboarding: un propietario autenticado sin complejo no puede usar
-  // las rutas de negocio (no existe cancha/reserva/pago sin un complejo). Se
-  // comprueba dentro de las rutas privadas, no en las publicas de auth, para
-  // evitar una query innecesaria en /login, /signup, etc. RLS hace que la query
-  // solo pueda ver el complejo propio.
-  if (user && !isPublicAuthRoute) {
-    const isOnboardingRoute = pathname === ONBOARDING_ROUTE;
+  // ----- Zona DUEÑO -----
+  if (pathname === '/panel' || pathname.startsWith('/panel/')) {
+    if (OWNER_AUTH_PAGES.includes(pathname)) {
+      if (user && accountType === 'owner') return redirectTo('/panel');
+      return supabaseResponse;
+    }
+    if (!user) return redirectTo('/panel/ingresar');
+    if (accountType !== 'owner') return redirectTo('/');
 
+    const isOnboarding = pathname === '/panel/onboarding';
     const { data: facility } = await supabase
       .from('facilities')
       .select('id')
       .limit(1)
       .maybeSingle();
     const hasFacility = Boolean(facility);
-
-    if (!hasFacility && !isOnboardingRoute) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = ONBOARDING_ROUTE;
-      return NextResponse.redirect(redirectUrl);
-    }
-
-    if (hasFacility && isOnboardingRoute) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = '/';
-      return NextResponse.redirect(redirectUrl);
-    }
+    if (!hasFacility && !isOnboarding) return redirectTo('/panel/onboarding');
+    if (hasFacility && isOnboarding) return redirectTo('/panel');
+    return supabaseResponse;
   }
 
+  // ----- Zona CLIENTE -----
+  if (pathname === '/cuenta' || pathname.startsWith('/cuenta/')) {
+    if (!user) return redirectTo('/ingresar');
+    if (accountType !== 'customer') return redirectTo('/panel');
+    return supabaseResponse;
+  }
+
+  // Páginas de auth del cliente: si ya hay cliente logueado, va a su cuenta.
+  if (CUSTOMER_AUTH_PAGES.includes(pathname) && user && accountType === 'customer') {
+    return redirectTo('/cuenta');
+  }
+
+  // PÚBLICO (`/`, `/c/*`, `/auth/callback`, resto) — pasa.
   return supabaseResponse;
 }
 
 export const config = {
-  /**
-   * Protege todo excepto assets estaticos y favicon. Las rutas de negocio
-   * (/, /reservas, /fields, /customers, /payments, /settings, /dashboard)
-   * quedan cubiertas; las rutas de /login, /signup y /forgot-password se
-   * dejan pasar dentro del middleware.
-   */
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],

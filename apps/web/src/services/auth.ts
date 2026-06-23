@@ -41,7 +41,7 @@ export async function signUp({ email, password, fullName }: SignUpInput): Promis
     email,
     password,
     options: {
-      data: { full_name: fullName },
+      data: { full_name: fullName, account_type: 'owner' },
     },
   });
 
@@ -53,12 +53,13 @@ export async function signUp({ email, password, fullName }: SignUpInput): Promis
 }
 
 /**
- * Cierra la sesion en Supabase (limpia la cookie httpOnly) y redirige a /login.
+ * Cierra la sesion en Supabase (limpia la cookie httpOnly) y redirige al login
+ * del panel del dueño.
  */
 export async function signOut(): Promise<never> {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  redirect('/login');
+  redirect('/panel/ingresar');
 }
 
 /**
@@ -69,7 +70,7 @@ export async function resetPassword(email: string): Promise<AuthResult> {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   const options = appUrl
-    ? { redirectTo: `${appUrl}/callback?next=/update-password` }
+    ? { redirectTo: `${appUrl}/auth/callback?next=/panel/actualizar-clave` }
     : undefined;
   const { error } = await supabase.auth.resetPasswordForEmail(email, options);
 

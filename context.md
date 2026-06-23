@@ -5,10 +5,16 @@
 
 ## Estado actual
 
-- **Fase:** `5-development` (Gestión de Clientes — aprobada 2026-06-19). Arquitectura: ver D-002.
-- **Último avance:** FASE 5 (Gestión de Clientes) **implementada en código** (typecheck + `next build` OK, 16 rutas). Decisión Jean: soft delete vía `is_active`. Creados: migración `20260619000200_customers_soft_delete.sql`, `services/customers.ts` (listCustomers/createCustomer/updateCustomer/setCustomerActive), UI `customers/page.tsx` (server) + `customers-view.tsx` (tabla real, búsqueda nombre/teléfono, modal crear/editar, archivar). Se quitaron campos inexistentes del prototipo (email/visits/totalSpent/status VIP). FASE 4 implementada previamente (subt. 2–5).
-- **Próxima tarea:** Verificación E2E de Clientes en navegador (crear/listar/buscar/archivar). FASE 5 funcionalmente desbloqueada.
-- **Bloqueadores:** Ninguno. (Migración `20260619000200` de FASE 5 **aplicada en remoto** 2026-06-19 vía `supabase db push`. Diagnóstico del "no guarda clientes": el insert SÍ funcionaba — había 2 clientes en la BD — pero `listCustomers` filtraba por `is_active` inexistente y devolvía []. Con la columna creada, guardar/listar/buscar/soft-delete operan. Sin cambios de código.)
+- **Fase:** `2.0-development` en rama **`develop`** (rediseño total + portal de clientes). Arquitectura: ver **ADR-003** (`docs/adr/ADR-003-app-deporte-2.0.md`). Runbook: `docs/RUNBOOK_2.0.md`.
+- **Último avance (2026-06-23, evolución 2.0):** Marketplace de dos lados + rediseño "dark premium / energético".
+  - **Portal de cliente (NUEVO):** landing/marketplace `/`, ficha+reserva `/c/[slug]` (slots de 30 min, multi-hora, anti-solapamiento), auth de cliente (`/ingresar`,`/registro`), `/cuenta` con subida de comprobante de adelanto. Acceso vía RPCs `SECURITY DEFINER` (no toca la RLS del dueño).
+  - **Panel del dueño (COMPLETADO + redISEÑADO) en `/panel/*`:** dashboard real (métricas hoy/semana/mes/ocupación), reservas (calendario por día, crear/cancelar/cobrar), pagos (validar/rechazar adelantos), canchas y clientes restilados, configuración funcional (publicar complejo, % adelanto, **horarios** por cancha).
+  - **Design system propio** en `components/ui` (tokens dark `ink`/`lime`, Sora+Inter, Button/Card/Badge/Input/Modal/StatCard…). Middleware de **3 zonas** (público/cliente/dueño) por `account_type` en el JWT.
+  - **Verificado sin DB:** typecheck 0 errores · `next build` 19 rutas · **38 tests** (web 20 + api 18) · dev server 200 en todas las rutas.
+- **Próxima tarea:** Levantar el **stack Supabase local** (Docker) y correr el E2E del runbook (`supabase start && db reset && pnpm dev` → checklist de `docs/RUNBOOK_2.0.md` §1). Luego: push del esquema 2.0 a remoto (§2) y deploy a Vercel (§3) cuando Jean lo decida.
+- **Bloqueadores:**
+  - **(D-003) Migración 2.0 NO aplicada:** `supabase/migrations/20260623000100_v2_customer_marketplace.sql` (customer_accounts, slug/is_published, customer_account_id, RPCs, bucket payment-proofs, routing de handle_new_user) está **solo en archivo** — no pusheada a remoto por decisión de Jean ("nada aplicado"). Tratar como NO hecha en remoto. Aplicar local con `supabase db reset`; remoto con `supabase db push` (runbook §2).
+  - **Docker engine no levantó** en la sesión (Docker Desktop abierto pero distro WSL `docker-desktop` *Stopped*). Necesita que Jean abra Docker y espere el engine en verde para correr local.
 
 ### Rediseño UI + consistencia (2026-06-19)
 - **Dashboard:** muestra el nombre real del complejo (`getMyFacility`) en vez de "La Bombonera" hardcodeado. Eliminada variable muerta `animateStats`.

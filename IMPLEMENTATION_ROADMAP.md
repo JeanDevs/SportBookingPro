@@ -12,6 +12,25 @@ Cada fase debe completarse, validarse y aprobarse antes de continuar.
 
 ---
 
+# Estado 2.0 (2026-06-23, rama `develop`)
+
+La evolución **2.0** (ADR-003) implementó, además del rediseño total dark premium y el **portal
+público de clientes**, las fases que quedaban como prototipo:
+
+- **FASE 6 — Reservas:** IMPLEMENTADA. Crear (multi-hora, intervalos 30 min), cancelar, cobrar;
+  anti-solapamiento por constraint GiST; disponibilidad por trigger. Panel `/panel/reservas` + RPC
+  `create_customer_booking` para el cliente.
+- **FASE 7 — Pagos:** IMPLEMENTADA. Registrar/validar/rechazar adelanto y saldo (CASH/YAPE/PLIN);
+  validar adelanto confirma la reserva. Panel `/panel/pagos` + comprobante del cliente (Storage).
+- **FASE 8 — Dashboard:** IMPLEMENTADA. Métricas reales (hoy/semana/ingresos mes/horas/por validar).
+- **NUEVO — Portal de cliente:** marketplace `/`, reserva `/c/[slug]`, cuenta `/cuenta`. Vía RPCs
+  `SECURITY DEFINER` (no toca la RLS del dueño).
+
+Verificado: typecheck 0 err · build 19 rutas · 38 tests. Pendiente: E2E con stack local + push a
+remoto (ver `docs/RUNBOOK_2.0.md`). FASES 9–15 siguen pendientes según lo de abajo.
+
+---
+
 # Regla Principal
 
 Antes de implementar cualquier funcionalidad:
