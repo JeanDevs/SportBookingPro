@@ -2,6 +2,9 @@ import Link from "next/link";
 import { MapPin, Goal, ArrowRight, Search, CalendarCheck, ShieldCheck } from "lucide-react";
 import { getPublicFacilities } from "@/services/public-catalog";
 import { SiteHeader, SiteFooter } from "@/components/public/site-header";
+import { AmenityChips } from "@/components/public/amenity-chips";
+import { OwnerCta } from "@/components/public/owner-cta";
+import { FaqSection, SocialProof } from "@/components/public/faq-section";
 import { Badge, EmptyState } from "@/components/ui";
 import { formatPEN } from "@/lib/format";
 
@@ -95,6 +98,7 @@ export default async function LandingPage() {
                 <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-400">
                   <MapPin size={14} /> {f.district ?? f.address ?? "Lima"}
                 </p>
+                <AmenityChips keys={f.amenities} max={3} className="mt-3" />
                 <div className="mt-4 flex items-center justify-between border-t border-ink-800 pt-4">
                   <span className="text-sm text-ink-300">
                     {f.fieldCount} {f.fieldCount === 1 ? "cancha" : "canchas"}
@@ -108,6 +112,10 @@ export default async function LandingPage() {
           </div>
         )}
       </section>
+
+      <SocialProof names={facilities.map((f) => f.name)} />
+      <OwnerCta />
+      <FaqSection />
 
       <SiteFooter />
     </>

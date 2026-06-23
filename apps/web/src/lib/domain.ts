@@ -81,6 +81,35 @@ export const PAYMENT_METHOD_META: Record<
   PLIN: { label: "Plin", emoji: "📲" },
 };
 
+/** Catálogo CERRADO de comodidades del complejo (indicadores de confianza).
+ * Se guarda el `key` en `facilities.amenities text[]`; el label/emoji vive aquí. */
+export type AmenityKey =
+  | "techada"
+  | "iluminacion"
+  | "estacionamiento"
+  | "vestuarios"
+  | "duchas"
+  | "cafetin"
+  | "wifi"
+  | "seguridad";
+
+export const AMENITIES: Record<AmenityKey, { label: string; emoji: string }> = {
+  techada: { label: "Cancha techada", emoji: "⛱️" },
+  iluminacion: { label: "Iluminación", emoji: "💡" },
+  estacionamiento: { label: "Estacionamiento", emoji: "🅿️" },
+  vestuarios: { label: "Vestuarios", emoji: "🚪" },
+  duchas: { label: "Duchas", emoji: "🚿" },
+  cafetin: { label: "Cafetín", emoji: "☕" },
+  wifi: { label: "WiFi", emoji: "📶" },
+  seguridad: { label: "Seguridad", emoji: "🛡️" },
+};
+
+export const AMENITY_KEYS = Object.keys(AMENITIES) as AmenityKey[];
+
+export function isAmenityKey(value: string): value is AmenityKey {
+  return value in AMENITIES;
+}
+
 /** Domingo=0 … Sábado=6, alineado con `extract(dow)` de Postgres. */
 export const WEEKDAYS_ES = [
   "Domingo",

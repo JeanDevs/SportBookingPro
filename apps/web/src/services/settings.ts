@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '../lib/supabase/server';
-import type { FieldType } from '../lib/domain';
+import { isAmenityKey, type FieldType } from '../lib/domain';
 
 /**
  * Configuración del complejo (lado DUEÑO): datos públicos + publicación en el
@@ -20,6 +20,7 @@ export interface FacilitySettings {
   isPublished: boolean;
   depositPercentage: number;
   holdMinutes: number;
+  amenities: string[];
 }
 
 interface FacilityRow {
@@ -33,6 +34,7 @@ interface FacilityRow {
   is_published: boolean;
   deposit_percentage: number | string;
   reservation_intent_hold_minutes: number;
+  amenities: string[] | null;
 }
 
 export async function getFacilitySettings(): Promise<FacilitySettings | null> {
@@ -40,7 +42,7 @@ export async function getFacilitySettings(): Promise<FacilitySettings | null> {
   const { data, error } = await supabase
     .from('facilities')
     .select(
-      'id, name, slug, phone, address, district, description, is_published, deposit_percentage, reservation_intent_hold_minutes',
+      'id, name, slug, phone, address, district, description, is_published, deposit_percentage, reservation_intent_hold_minutes, amenities',
     )
     .order('created_at', { ascending: true })
     .limit(1)
@@ -59,6 +61,7 @@ export async function getFacilitySettings(): Promise<FacilitySettings | null> {
     isPublished: f.is_published,
     depositPercentage: Number(f.deposit_percentage),
     holdMinutes: f.reservation_intent_hold_minutes,
+    amenities: f.amenities ?? [],
   };
 }
 
@@ -71,6 +74,7 @@ export interface UpdateFacilitySettingsInput {
   depositPercentage?: number;
   holdMinutes?: number;
   isPublished?: boolean;
+  amenities?: string[];
 }
 
 export async function updateFacilitySettings(
@@ -99,6 +103,10 @@ export async function updateFacilitySettings(
     patch.reservation_intent_hold_minutes = input.holdMinutes;
   }
   if (input.isPublished !== undefined) patch.is_published = input.isPublished;
+  if (input.amenities !== undefined) {
+    // Solo keys del catálogo cerrado (defensa contra valores arbitrarios).
+    patch.amenities = input.amenities.filter((a) => isAmenityKey(a));
+  }
 
   if (Object.keys(patch).length === 0) return { error: null };
 

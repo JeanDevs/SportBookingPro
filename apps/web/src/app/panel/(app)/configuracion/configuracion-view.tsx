@@ -10,6 +10,7 @@ import {
   CardTitle,
   CardContent,
   Field,
+  Label,
   Input,
   Textarea,
   Select,
@@ -23,8 +24,7 @@ import {
   type FacilitySettings,
   type FieldAvailability,
 } from "@/services/settings";
-import { WEEKDAYS_ES } from "@/lib/domain";
-import { fieldTypeMeta } from "@/lib/domain";
+import { WEEKDAYS_ES, fieldTypeMeta, AMENITIES, AMENITY_KEYS } from "@/lib/domain";
 
 const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0]; // Lun … Dom
 
@@ -82,6 +82,10 @@ function GeneralForm({ settings, onSaved }: { settings: FacilitySettings; onSave
   const [description, setDescription] = useState(settings.description ?? "");
   const [deposit, setDeposit] = useState(String(settings.depositPercentage));
   const [hold, setHold] = useState(String(settings.holdMinutes));
+  const [amenities, setAmenities] = useState<string[]>(settings.amenities);
+
+  const toggleAmenity = (key: string) =>
+    setAmenities((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
 
   const save = () => {
     setMsg(null);
@@ -94,6 +98,7 @@ function GeneralForm({ settings, onSaved }: { settings: FacilitySettings; onSave
         description,
         depositPercentage: Number(deposit),
         holdMinutes: Number(hold),
+        amenities,
       });
       if (res.error) setMsg({ tone: "red", text: res.error });
       else {
@@ -139,6 +144,30 @@ function GeneralForm({ settings, onSaved }: { settings: FacilitySettings; onSave
           <Field label="Bloqueo (min)" hint="Expira la intención">
             <Input type="number" min="1" max="120" value={hold} onChange={(e) => setHold(e.target.value)} />
           </Field>
+        </div>
+        <div>
+          <Label>Comodidades (se muestran en tu ficha pública)</Label>
+          <div className="flex flex-wrap gap-2">
+            {AMENITY_KEYS.map((key) => {
+              const active = amenities.includes(key);
+              const a = AMENITIES[key];
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => toggleAmenity(key)}
+                  className={
+                    "inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-sm font-medium transition " +
+                    (active
+                      ? "border-lime-400/50 bg-lime-400/15 text-lime-200"
+                      : "border-ink-700 bg-ink-900/60 text-ink-300 hover:border-ink-600")
+                  }
+                >
+                  <span>{a.emoji}</span> {a.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
         {msg ? <Alert tone={msg.tone}>{msg.text}</Alert> : null}
         <div className="flex justify-end">

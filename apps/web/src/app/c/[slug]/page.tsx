@@ -3,6 +3,7 @@ import { MapPin, Phone } from "lucide-react";
 import { getPublicFacility } from "@/services/public-catalog";
 import { getCustomerUser } from "@/services/customer-auth";
 import { SiteHeader, SiteFooter } from "@/components/public/site-header";
+import { AmenityChips } from "@/components/public/amenity-chips";
 import { limaDateInput } from "@/lib/format";
 import { BookingView } from "./booking-view";
 
@@ -41,6 +42,7 @@ export default async function FacilityPage({
           {facility.description ? (
             <p className="mt-4 max-w-2xl text-ink-300">{facility.description}</p>
           ) : null}
+          <AmenityChips keys={facility.amenities} className="mt-4" />
         </div>
       </section>
 

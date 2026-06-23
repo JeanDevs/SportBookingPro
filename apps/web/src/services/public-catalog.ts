@@ -18,6 +18,7 @@ export interface PublicFacilityCard {
   description: string | null;
   fieldCount: number;
   minPrice: number | null;
+  amenities: string[];
 }
 
 export interface PublicField {
@@ -36,6 +37,7 @@ export interface PublicFacility {
   phone: string | null;
   description: string | null;
   depositPercentage: number;
+  amenities: string[];
   fields: PublicField[];
 }
 
@@ -59,6 +61,7 @@ export async function getPublicFacilities(): Promise<PublicFacilityCard[]> {
     description: (r.description as string) ?? null,
     fieldCount: Number(r.field_count ?? 0),
     minPrice: r.min_price == null ? null : Number(r.min_price),
+    amenities: (r.amenities as string[]) ?? [],
   }));
 }
 
@@ -76,6 +79,7 @@ export async function getPublicFacility(slug: string): Promise<PublicFacility | 
     phone: (f.phone as string) ?? null,
     description: (f.description as string) ?? null,
     depositPercentage: Number(f.deposit_percentage ?? 30),
+    amenities: (f.amenities as string[]) ?? [],
     fields: ((f.fields as Record<string, unknown>[]) ?? []).map((fl) => ({
       id: String(fl.id),
       name: String(fl.name),
