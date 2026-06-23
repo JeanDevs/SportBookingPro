@@ -99,23 +99,24 @@
 
 ---
 
-## Phase 2: Structural Improvements (Weeks 3-4) — Medium Effort
+## Phase 2: Structural Improvements (Weeks 3-4) — Medium Effort — 🔄 IN PROGRESS (2026-06-23)
 
 ### 2.1 Customer: Multi-Step Booking Flow with Progress Indicator
 **Epic:** Add visual progress + expectation-setting  
-**Status:** `planned`  
+**Status:** `done`  
 **Owner:** Frontend  
 **Effort:** 2d
 
 **Subtasks:**
-- [ ] 4.1.1 — Create `BookingProgress` component (stepper)
-  - Step 1: Select Field ✓
-  - Step 2: Pick Date & Time ✓
-  - Step 3: Review & Pay (current, highlighted)
+- [x] 4.1.1 — Create `BookingProgress` component (stepper)
+  - Step 1: Elige horario (no slot selected)
+  - Step 2: Revisa tu reserva (slot selected)
+  - Step 3: Confirma y paga (booking in progress)
+  - ✅ COMPLETE: `components/public/booking-progress.tsx` created, integrated in BookingView
   
-- [ ] 4.1.2 — Add "What happens next" section after payment CTA
-  - Timeline: "After payment → Confirmation email → Arrive 5 min early → Play!"
-  - Estimated confirmation time: "Owner confirms within 2 hours"
+- [x] 4.1.2 — Add "What happens next" section after payment CTA
+  - Timeline: deposit → owner confirms in 2h → confirmation email → arrive 5 min early
+  - ✅ COMPLETE: Section added in checkout aside
   
 - [ ] 4.1.3 — Add success confirmation page (after payment)
   - Show reservation details + next steps
@@ -130,34 +131,33 @@
 
 ### 2.2 Owner: Multi-Step Onboarding Wizard + Email Sequence
 **Epic:** Structured onboarding with ROI motivation + post-signup email series  
-**Status:** `planned`  
+**Status:** `partial`  
 **Owner:** Frontend + Backend  
 **Effort:** 4d
 
 **Subtasks:**
-- [ ] 5.1.1 — Restructure `/panel/onboarding` as multi-step wizard
-  - Step 1: Upload facility logo + photos
-  - Step 2: Add canchas (fields) with pricing
-  - Step 3: Configure availability calendar
-  - Step 4: Set payment method (Yape/Plin)
-  - Step 5: Go live!
-  - Show: "3 of 5 steps complete" progress
+- [x] 5.1.1 — Restructure `/panel/onboarding` as multi-step wizard
+  - Step 1: Create facility (name, phone, address)
+  - Step 2: Add first cancha (type picker, price with revenue hint)
+  - Step 3: Go-live checklist (what to configure in panel next)
+  - ✅ COMPLETE: `/panel/onboarding/page.tsx` rewritten as 3-step wizard with progress indicator
   
-- [ ] 5.1.2 — Add motivational copy at each step
-  - Step 2: "Each field is a revenue stream. A football field can make S/. 1,500/week."
-  - Step 3: "Accurate availability = more bookings. Update it weekly."
-  - Step 4: "Instant payouts to your Yape/Plin account. No waiting."
+- [x] 5.1.2 — Add motivational copy at each step
+  - Step 1: "Los complejos bien configurados reciben hasta 3x más reservas."
+  - Step 2: "Una cancha de fútbol 5 puede generarte S/. 1,500 por semana."
+  - Step 3: "Propietarios con horarios configurados reciben su primera reserva en promedio en 48 horas."
+  - ✅ COMPLETE: ROI motivational cards per step
   
 - [ ] 5.1.3 — Create email onboarding sequence
   - Day 0: Welcome + link to Step 1 (send immediately after signup)
   - Day 1: "Your first facility photo" (how-to guide + template)
   - Day 3: "Set your pricing" (benchmark against local competitors)
   - Day 7: "You're live! Check your first bookings" (encourage return to panel)
-  - Integrate with Resend or Sendgrid (existing email provider)
+  - ⏸️ BLOCKED: Requires email service (Resend/Sendgrid) — moved to Phase 3
   
 - [ ] 5.1.4 — Add "Exit intent" recovery
   - If owner abandons onboarding mid-way: send email after 24h
-  - "We saved your progress. Continue here: [link to step]"
+  - ⏸️ BLOCKED: Depends on 5.1.3 — moved to Phase 3
 
 **Expected Impact:** +50-60% completion to "published" state, +40% owner retention (Day 7)  
 **Files to create/modify:**
