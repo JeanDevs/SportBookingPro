@@ -229,6 +229,36 @@
 
 ---
 
+---
+
+## Phase 2 (cont.): Comprobante vía WhatsApp — Pendiente
+
+### 2.4 Customer: Envío de comprobante por WhatsApp
+**Epic:** Reemplazar el upload de imagen con un flujo WhatsApp nativo  
+**Status:** `planned`  
+**Owner:** Frontend  
+**Effort:** 1d  
+**Contexto:** El botón "Enviar adelanto" actualmente registra el método de pago pero no sube foto (simplificado 2026-06-26). El comprobante real llega por WhatsApp al complejo fuera del sistema.
+
+**Subtasks:**
+- [ ] 2.4.1 — Al confirmar adelanto, generar enlace `wa.me` pre-llenado con mensaje
+  - Formato: "Hola, soy [nombre cliente]. Reserva: [nombre instalación] · [fecha] [horario]. Adjunto comprobante de adelanto S/.[monto] por [método]."
+  - Número de WhatsApp: usar el teléfono del complejo registrado en `facilities.phone`
+  - Abrir en nueva pestaña después de confirmar (post onDone)
+- [ ] 2.4.2 — Agregar teléfono del complejo al tipo `CustomerBooking` (servicio + RPC)
+  - Modificar `my_customer_bookings` RPC para incluir `facility_phone`
+  - Actualizar `CustomerBooking` interface en `customer-bookings.ts`
+- [ ] 2.4.3 — Mostrar en la tarjeta de reserva el estado "Enviar comprobante por WhatsApp"
+  - Reemplazar el badge neutro con enlace directo al WhatsApp del complejo
+
+**Expected Impact:** Comprobante llega al complejo sin fricción de subida de archivos  
+**Files to modify:**
+- `apps/web/src/app/cuenta/cuenta-view.tsx`
+- `apps/web/src/services/customer-bookings.ts`
+- Database: RPC `my_customer_bookings` (agregar `facility_phone`)
+
+---
+
 ## Phase 4: Growth Experiments (Week 6+) — Optional, Data-Driven
 
 ### 4.1 Email Recovery for Abandoned Bookings

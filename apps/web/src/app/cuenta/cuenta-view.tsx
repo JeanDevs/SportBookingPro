@@ -3,10 +3,9 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, LogOut, Upload, Loader2, Search } from "lucide-react";
+import { CalendarDays, LogOut, Upload, Loader2, Search, CheckCircle } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button, Badge, Modal, Field, Select, Alert, EmptyState } from "@/components/ui";
-import { createClient } from "@/lib/supabase/client";
 import { submitProof, type CustomerBooking } from "@/services/customer-bookings";
 import { signOutCustomer } from "@/services/customer-auth";
 import { formatPEN, formatLimaDateLong, formatLimaRange } from "@/lib/format";
@@ -154,56 +153,55 @@ function ProofModal({
 }) {
   const [isPending, startTransition] = useTransition();
   const [method, setMethod] = useState<PaymentMethod>("YAPE");
-  const [file, setFile] = useState<File | null>(null);
+  const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
   const submit = () => {
     setError("");
-    if (!file) return setError("Adjunta una imagen del comprobante.");
-    if (!file.type.startsWith("image/")) return setError("El comprobante debe ser una imagen.");
-    if (file.size > 5 * 1024 * 1024) return setError("La imagen no debe superar 5 MB.");
-
     startTransition(async () => {
-      try {
-        const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) {
-          setError("Tu sesión expiró. Inicia sesión de nuevo.");
-          return;
-        }
-        const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase();
-        const path = `${user.id}/${booking.id}-${file.size}.${ext}`;
-        const up = await supabase.storage
-          .from("payment-proofs")
-          .upload(path, file, { upsert: true, contentType: file.type });
-        if (up.error) {
-          setError("No se pudo subir la imagen. Inténtalo de nuevo.");
-          return;
-        }
-        const { data: pub } = supabase.storage.from("payment-proofs").getPublicUrl(path);
-        const res = await submitProof({
-          reservationId: booking.id,
-          method,
-          proofUrl: pub.publicUrl,
-        });
-        if (res.error) {
-          setError(res.error);
-          return;
-        }
-        onDone();
-      } catch {
-        setError("Ocurrió un error al enviar el comprobante.");
+      const res = await submitProof({
+        reservationId: booking.id,
+        method,
+        proofUrl: "whatsapp-pending",
+      });
+      if (res.error) {
+        setError(res.error);
+        return;
       }
+      setDone(true);
     });
   };
+
+  if (done) {
+    return (
+      <Modal
+        open
+        onClose={onDone}
+        title="¡Adelanto registrado!"
+        description={`${booking.facilityName} · ${formatLimaRange(booking.startAt, booking.endAt)}`}
+        footer={
+          <Button onClick={onDone} className="w-full">
+            Entendido
+          </Button>
+        }
+      >
+        <div className="flex flex-col items-center gap-3 py-4 text-center">
+          <CheckCircle size={48} className="text-lime-400" />
+          <p className="text-sm text-ink-300">
+            Tu adelanto de{" "}
+            <span className="font-semibold text-ink-100">{formatPEN(booking.depositRequiredAmount)}</span>{" "}
+            fue registrado. El complejo lo validará en breve.
+          </p>
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal
       open
       onClose={onClose}
-      title="Enviar adelanto"
+      title="Confirmar adelanto"
       description={`${booking.facilityName} · ${formatLimaRange(booking.startAt, booking.endAt)}`}
       footer={
         <>
@@ -213,10 +211,10 @@ function ProofModal({
           <Button onClick={submit} disabled={isPending}>
             {isPending ? (
               <>
-                <Loader2 size={15} className="animate-spin" /> Enviando…
+                <Loader2 size={15} className="animate-spin" /> Confirmando…
               </>
             ) : (
-              "Enviar comprobante"
+              "Confirmar adelanto"
             )}
           </Button>
         </>
@@ -229,7 +227,7 @@ function ProofModal({
             <span className="font-display font-bold">{formatPEN(booking.depositRequiredAmount)}</span>
           </p>
           <p className="mt-0.5 text-xs text-lime-200/70">
-            Paga por Yape/Plin o en efectivo y sube tu comprobante. El complejo lo validará.
+            Paga por Yape/Plin o en efectivo y envía el comprobante por WhatsApp al complejo.
           </p>
         </div>
         <Field label="Método de pago">
@@ -240,14 +238,6 @@ function ProofModal({
               </option>
             ))}
           </Select>
-        </Field>
-        <Field label="Comprobante (imagen)">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="block w-full text-sm text-ink-300 file:mr-3 file:rounded-lg file:border-0 file:bg-ink-700 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink-100 hover:file:bg-ink-600"
-          />
         </Field>
         {error ? <Alert>{error}</Alert> : null}
       </div>

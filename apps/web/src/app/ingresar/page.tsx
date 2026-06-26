@@ -58,6 +58,11 @@ export default function CustomerLoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </Field>
+        <div className="text-right">
+          <Link href="/recuperar" className="text-sm font-medium text-lime-300 hover:text-lime-200">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
         {error ? <Alert>{error}</Alert> : null}
         <Button type="submit" className="w-full" size="lg" disabled={isPending}>
           {isPending ? "Entrando…" : "Entrar"}
