@@ -44,16 +44,12 @@ export async function signUpCustomer({
   });
 
   if (error) {
-    if (error.message.toLowerCase().includes('registered')) {
-      return { error: 'Ese correo ya está registrado. Inicia sesión.' };
-    }
     return { error: 'No se pudo completar el registro.' };
   }
 
-  if (data.user?.identities?.length === 0) {
-    return { error: 'Ese correo ya está registrado. Inicia sesión.' };
-  }
-
+  // Same anti-enumeration pattern as auth.ts: never reveal whether the email is taken.
+  // identities:[] means already registered; returning success either way leaks nothing.
+  // Middleware gates /cuenta on a valid session — no session → redirect to /ingresar.
   return { error: null };
 }
 

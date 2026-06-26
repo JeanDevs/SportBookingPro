@@ -49,12 +49,10 @@ export async function signUp({ email, password, fullName }: SignUpInput): Promis
     return { error: 'No se pudo completar el registro.' };
   }
 
-  // Supabase returns an empty identities array when the email is already registered
-  // (silent behavior to prevent email enumeration — no error is thrown).
-  if (data.user?.identities?.length === 0) {
-    return { error: 'Ya existe una cuenta con este correo. Inicia sesión o recupera tu contraseña.' };
-  }
-
+  // Supabase silently returns identities:[] when the email is already taken (their own
+  // anti-enumeration design). We must NOT reveal this — returning success either way
+  // ensures the registration endpoint leaks nothing. The middleware gates /panel on a
+  // valid session, so an already-registered user is simply bounced to the login page.
   return { error: null };
 }
 
