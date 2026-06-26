@@ -42,7 +42,7 @@ export function Logo({
       <LogoMark />
       <div className="leading-none">
         <p className="font-display text-base font-bold tracking-tight text-ink-50">
-          APP<span className="text-lime-400">DEPORTE</span>
+          SportBook<span className="text-lime-400"> Pro</span>
         </p>
         {subtitle ? (
           <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-ink-400">

@@ -125,7 +125,7 @@ export default function OnboardingPage() {
 
   return (
     <AuthShell
-      heroTitle="Bienvenido a APP DEPORTE."
+      heroTitle="Bienvenido a SportBook Pro."
       heroSubtitle={meta.motivation}
       title={meta.title}
       subtitle={meta.subtitle}

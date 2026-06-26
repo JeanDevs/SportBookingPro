@@ -61,7 +61,7 @@ export function SocialProof({ names }: { names: string[] }) {
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
         <p className="flex items-center justify-center gap-2 text-center text-sm font-semibold uppercase tracking-wide text-ink-400">
           <ShieldCheck size={16} className="text-lime-400" />
-          Complejos que ya reciben reservas con APP DEPORTE
+          Complejos que ya reciben reservas con SportBook Pro
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           {names.map((name) => (

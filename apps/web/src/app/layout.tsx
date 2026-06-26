@@ -22,8 +22,8 @@ const sora = Sora({
 
 export const metadata: Metadata = {
   title: {
-    default: "APP DEPORTE — Reserva tu cancha",
-    template: "%s · APP DEPORTE",
+    default: "SportBook Pro — Reserva tu cancha",
+    template: "%s · SportBook Pro",
   },
   description:
     "Reserva canchas deportivas en segundos y gestiona tu complejo: reservas, pagos y clientes en un solo lugar.",

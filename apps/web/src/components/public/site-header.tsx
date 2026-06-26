@@ -46,7 +46,7 @@ export function SiteFooter() {
     <footer className="border-t border-ink-800 px-5 py-10 sm:px-8">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-ink-400 sm:flex-row">
         <Logo subtitle="Canchas deportivas en Perú" />
-        <p>© {new Date().getFullYear()} APP DEPORTE · Hecho en Lima 🇵🇪</p>
+        <p>© {new Date().getFullYear()} SportBook Pro · Hecho en Lima 🇵🇪</p>
         <Link href="/panel" className="font-semibold text-lime-300 hover:text-lime-200">
           ¿Tienes un complejo? Publícalo →
         </Link>
