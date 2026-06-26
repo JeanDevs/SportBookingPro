@@ -31,7 +31,7 @@ export async function signUpCustomer({
   if (password.length < 6) return { error: 'La contraseña debe tener al menos 6 caracteres.' };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -49,6 +49,11 @@ export async function signUpCustomer({
     }
     return { error: 'No se pudo completar el registro.' };
   }
+
+  if (data.user?.identities?.length === 0) {
+    return { error: 'Ese correo ya está registrado. Inicia sesión.' };
+  }
+
   return { error: null };
 }
 

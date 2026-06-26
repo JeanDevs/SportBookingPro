@@ -54,7 +54,7 @@ export default function OwnerLoginPage() {
           />
         </Field>
         <div className="text-right">
-          <Link href="/panel/recuperar" className="text-sm text-ink-400 hover:text-ink-200">
+          <Link href="/panel/recuperar" className="text-sm font-medium text-lime-300 hover:text-lime-200">
             ¿Olvidaste tu contraseña?
           </Link>
         </div>

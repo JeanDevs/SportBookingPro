@@ -17,8 +17,13 @@ port = 54323
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://localhost:3000", "http://localhost:3000/auth/callback"]
+site_url = "https://sportbook-pro.vercel.app"
+additional_redirect_urls = [
+  "https://sportbook-pro.vercel.app",
+  "https://sportbook-pro.vercel.app/auth/callback",
+  "http://localhost:3000",
+  "http://localhost:3000/auth/callback"
+]
 minimum_password_length = 6
 
 # Local dev: sin confirmación de email para iterar la demo sin fricción.

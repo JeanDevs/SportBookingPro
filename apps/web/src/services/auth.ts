@@ -37,7 +37,7 @@ export async function signIn(email: string, password: string): Promise<AuthResul
 export async function signUp({ email, password, fullName }: SignUpInput): Promise<AuthResult> {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -47,6 +47,12 @@ export async function signUp({ email, password, fullName }: SignUpInput): Promis
 
   if (error) {
     return { error: 'No se pudo completar el registro.' };
+  }
+
+  // Supabase returns an empty identities array when the email is already registered
+  // (silent behavior to prevent email enumeration — no error is thrown).
+  if (data.user?.identities?.length === 0) {
+    return { error: 'Ya existe una cuenta con este correo. Inicia sesión o recupera tu contraseña.' };
   }
 
   return { error: null };
