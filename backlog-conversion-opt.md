@@ -7,6 +7,39 @@
 
 ---
 
+## Bugs Activos — Investigación Pendiente
+
+### B-001: Endpoints de auth rotos en mobile
+**Tipo:** Bug / Investigación  
+**Status:** `open`  
+**Owner:** Backend + Frontend  
+**Detectado:** 2026-06-26  
+**Prioridad:** Alta — afecta conversión en mobile directamente
+
+**Síntoma:** Los endpoints de autenticación (login, registro, recuperación de contraseña) presentan comportamiento roto en dispositivos móviles. Pendiente auditoría completa.
+
+**Contexto conocido:**
+- Next.js Server Actions siempre devuelven HTTP 200 a nivel de transporte — no configurable sin migrar a Route Handlers.
+- El fix de user-enumeration (2026-06-26) actúa a nivel de contenido de respuesta, no de código HTTP.
+- Supabase Dashboard `site_url` aún no actualizado a `https://sportbook-pro.vercel.app` → probable causa de fallos en el flujo de reset de contraseña en todos los dispositivos, más visible en mobile.
+
+**Subtasks:**
+- [ ] B-001.1 — Reproducir en mobile (iOS Safari + Android Chrome) los flujos: login, registro, olvide contraseña
+- [ ] B-001.2 — Auditar respuestas HTTP reales en Network tab de DevTools / Vercel runtime logs
+- [ ] B-001.3 — Evaluar migración de Server Actions → Route Handlers para auth (permite status codes correctos: 401, 409, 422)
+- [x] B-001.4 — Actualizar Supabase Dashboard: `site_url` = `https://sportbook-pro.vercel.app`, redirect URL = `https://sportbook-pro.vercel.app/**` ✅ 2026-06-26
+- [ ] B-001.5 — Verificar flujo completo de recuperación de contraseña end-to-end en mobile tras B-001.4
+
+**Bloquea:** Tarea 2.4 (si el usuario no puede confirmar comprobante desde mobile), Fase 4.1 (email recovery)  
+**Archivos probables:**
+- `apps/web/src/services/auth.ts`
+- `apps/web/src/services/customer-auth.ts`
+- `apps/web/src/app/ingresar/page.tsx`
+- `apps/web/src/app/registro/page.tsx`
+- `apps/web/src/app/recuperar/page.tsx`
+
+---
+
 ## Phase 1: Quick Wins (Weeks 1-2) — High Impact, Low Effort — ✅ COMPLETE (2026-06-23)
 
 ### 1.1 Customer Path: Early Login (Login Friction Reduction)
