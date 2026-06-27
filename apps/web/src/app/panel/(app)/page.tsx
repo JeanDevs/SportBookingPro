@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CalendarDays, Wallet, Clock4, Goal, Plus, ArrowUpRight } from "lucide-react";
 import { getDashboardData } from "@/services/dashboard";
+import { getActivationStatus } from "@/services/activation";
+import { GoLiveChecklist } from "@/components/panel/go-live-checklist";
 import {
   StatCard,
   Card,
@@ -16,7 +18,7 @@ import { formatPEN, formatLimaDateLong, formatLimaRange } from "@/lib/format";
 import { RESERVATION_STATUS_META, fieldTypeMeta } from "@/lib/domain";
 
 export default async function DashboardPage() {
-  const d = await getDashboardData();
+  const [d, activation] = await Promise.all([getDashboardData(), getActivationStatus()]);
 
   return (
     <>
@@ -30,6 +32,8 @@ export default async function DashboardPage() {
         }
       />
       <PageBody>
+        {activation.state !== "ACTIVATED" ? <GoLiveChecklist status={activation} /> : null}
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Reservas hoy"

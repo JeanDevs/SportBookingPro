@@ -21,6 +21,8 @@ import { PageHeader, PageBody } from "@/components/panel/page-header";
 import {
   updateFacilitySettings,
   setFieldAvailability,
+  publishFacility,
+  unpublishFacility,
   type FacilitySettings,
   type FieldAvailability,
 } from "@/services/settings";
@@ -183,15 +185,25 @@ function GeneralForm({ settings, onSaved }: { settings: FacilitySettings; onSave
 function PublishCard({ settings, onSaved }: { settings: FacilitySettings; onSaved: () => void }) {
   const [isPending, startTransition] = useTransition();
   const [published, setPublished] = useState(settings.isPublished);
+  const [error, setError] = useState("");
   const publicPath = settings.slug ? `/c/${settings.slug}` : null;
 
+  // Publicar pasa por publishFacility, que valida precondiciones (≥1 cancha
+  // activa con horario) para no quedar visible sin slots reservables.
   const toggle = () => {
     const next = !published;
+    setError("");
     setPublished(next);
     startTransition(async () => {
-      const res = await updateFacilitySettings(settings.id, { isPublished: next });
-      if (res.error) setPublished(!next);
-      else onSaved();
+      const res = next
+        ? await publishFacility(settings.id)
+        : await unpublishFacility(settings.id);
+      if (res.error) {
+        setPublished(!next);
+        setError(res.error);
+      } else {
+        onSaved();
+      }
     });
   };
 
@@ -238,6 +250,7 @@ function PublishCard({ settings, onSaved }: { settings: FacilitySettings; onSave
             />
           </span>
         </button>
+        {error ? <Alert>{error}</Alert> : null}
         {publicPath ? (
           <a
             href={publicPath}

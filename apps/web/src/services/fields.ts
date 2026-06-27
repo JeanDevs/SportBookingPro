@@ -2,6 +2,7 @@
 
 import { createClient } from '../lib/supabase/server';
 import { getMyFacility } from './facilities';
+import { applyDefaultWeeklyAvailability } from './settings';
 import { validateFieldInput } from './validators';
 
 /**
@@ -48,6 +49,16 @@ export interface UpdateFieldInput {
 
 export interface FieldResult {
   error: string | null;
+}
+
+export interface CreateFieldResult extends FieldResult {
+  fieldId?: string;
+}
+
+export interface CreateFieldOptions {
+  /** Siembra el horario por defecto (L–D 08:00–23:00) para que la cancha sea
+   * reservable de inmediato. Usado por el onboarding del dueño. */
+  seedAvailability?: boolean;
 }
 
 interface FieldRow {
@@ -98,7 +109,10 @@ export async function listFields(): Promise<Field[]> {
  * `owner_id = auth.uid()`, el segundo porque la cancha cuelga del unico complejo
  * del propietario (MVP de un solo complejo).
  */
-export async function createField(input: CreateFieldInput): Promise<FieldResult> {
+export async function createField(
+  input: CreateFieldInput,
+  options: CreateFieldOptions = {},
+): Promise<CreateFieldResult> {
   const validationError = validateFieldInput(input);
   if (validationError) {
     return { error: validationError };
@@ -119,19 +133,30 @@ export async function createField(input: CreateFieldInput): Promise<FieldResult>
     return { error: 'Primero debes crear tu complejo.' };
   }
 
-  const { error } = await supabase.from('fields').insert({
-    owner_id: user.id,
-    facility_id: facility.id,
-    name: input.name.trim(),
-    type: input.type,
-    price_per_hour: input.pricePerHour,
-  });
+  const { data, error } = await supabase
+    .from('fields')
+    .insert({
+      owner_id: user.id,
+      facility_id: facility.id,
+      name: input.name.trim(),
+      type: input.type,
+      price_per_hour: input.pricePerHour,
+    })
+    .select('id')
+    .single();
 
-  if (error) {
+  if (error || !data) {
     return { error: 'No se pudo crear la cancha.' };
   }
 
-  return { error: null };
+  const fieldId = data.id as string;
+
+  // Onboarding: dejar la cancha reservable desde el minuto cero (evita 0 slots).
+  if (options.seedAvailability) {
+    await applyDefaultWeeklyAvailability(fieldId);
+  }
+
+  return { error: null, fieldId };
 }
 
 /**

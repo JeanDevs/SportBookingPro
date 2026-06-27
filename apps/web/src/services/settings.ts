@@ -169,6 +169,63 @@ export async function getFieldsAvailability(): Promise<FieldAvailability[]> {
   }));
 }
 
+/** Horario por defecto sugerido al crear una cancha: todos los días 08:00–23:00.
+ * Hace que la cancha sea inmediatamente reservable (evita el dead-end de 0 slots).
+ * Idempotente: solo siembra si la cancha aún no tiene reglas de disponibilidad. */
+export async function applyDefaultWeeklyAvailability(
+  fieldId: string,
+): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { data: existing } = await supabase
+    .from('field_availability_rules')
+    .select('id')
+    .eq('field_id', fieldId)
+    .limit(1);
+  if ((existing ?? []).length > 0) return { error: null };
+
+  const windows: WeeklyWindow[] = Array.from({ length: 7 }, (_, dow) => ({
+    dayOfWeek: dow,
+    startTime: '08:00',
+    endTime: '23:00',
+  }));
+  return setFieldAvailability(fieldId, windows);
+}
+
+/** Publica el complejo en el marketplace tras validar precondiciones: debe tener
+ * al menos una cancha ACTIVA con disponibilidad configurada; de lo contrario
+ * aparecería sin slots reservables. Devuelve un error legible si aún no califica. */
+export async function publishFacility(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+
+  const { data: fields } = await supabase.from('fields').select('id').eq('status', 'ACTIVE');
+  const activeIds = (fields ?? []).map((f) => f.id as string);
+  if (activeIds.length === 0) {
+    return { error: 'Agrega al menos una cancha activa antes de publicar.' };
+  }
+
+  const { data: rules } = await supabase
+    .from('field_availability_rules')
+    .select('field_id')
+    .in('field_id', activeIds)
+    .eq('is_active', true)
+    .limit(1);
+  if ((rules ?? []).length === 0) {
+    return { error: 'Configura los horarios de al menos una cancha antes de publicar.' };
+  }
+
+  const { error } = await supabase.from('facilities').update({ is_published: true }).eq('id', id);
+  if (error) return { error: 'No se pudo publicar el complejo.' };
+  return { error: null };
+}
+
+/** Quita el complejo del marketplace (sigue existiendo y operando en el panel). */
+export async function unpublishFacility(id: string): Promise<{ error: string | null }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from('facilities').update({ is_published: false }).eq('id', id);
+  if (error) return { error: 'No se pudo despublicar el complejo.' };
+  return { error: null };
+}
+
 /** Reemplaza la disponibilidad semanal de una cancha (borra + inserta). */
 export async function setFieldAvailability(
   fieldId: string,
