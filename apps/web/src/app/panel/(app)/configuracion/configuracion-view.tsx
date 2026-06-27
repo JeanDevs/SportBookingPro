@@ -357,7 +357,7 @@ function AvailabilityCard({
                 value={d.start}
                 disabled={!d.open}
                 onChange={(e) => update(d.dayOfWeek, { start: e.target.value })}
-                className="h-9 flex-1 rounded-lg border border-ink-700 bg-ink-900 px-2 text-sm text-ink-100 outline-none disabled:opacity-40"
+                className="h-9 flex-1 rounded-lg border border-ink-700 bg-ink-900 px-2 text-base sm:text-sm text-ink-100 outline-none disabled:opacity-40"
               />
               <span className="text-ink-500">→</span>
               <input
@@ -366,7 +366,7 @@ function AvailabilityCard({
                 value={d.end}
                 disabled={!d.open}
                 onChange={(e) => update(d.dayOfWeek, { end: e.target.value })}
-                className="h-9 flex-1 rounded-lg border border-ink-700 bg-ink-900 px-2 text-sm text-ink-100 outline-none disabled:opacity-40"
+                className="h-9 flex-1 rounded-lg border border-ink-700 bg-ink-900 px-2 text-base sm:text-sm text-ink-100 outline-none disabled:opacity-40"
               />
             </div>
           </div>

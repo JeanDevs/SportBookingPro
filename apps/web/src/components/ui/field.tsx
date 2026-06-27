@@ -1,14 +1,56 @@
 import { forwardRef } from "react";
 import { cn } from "./cn";
 
+// `text-base sm:text-sm`: 16px en móvil evita el auto-zoom de iOS al enfocar el
+// campo (Safari hace zoom cuando la fuente es <16px); 14px desde sm en adelante.
 const controlBase =
-  "w-full rounded-xl border border-ink-700 bg-ink-900/70 px-3.5 py-2.5 text-sm text-ink-100 placeholder:text-ink-400 outline-none transition focus:border-lime-400/70 focus:ring-2 focus:ring-lime-400/15 disabled:opacity-50";
+  "w-full rounded-xl border border-ink-700 bg-ink-900/70 px-3.5 py-2.5 text-base sm:text-sm text-ink-100 placeholder:text-ink-400 outline-none transition focus:border-lime-400/70 focus:ring-2 focus:ring-lime-400/15 disabled:opacity-50";
+
+type MobileDefaults = Pick<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "inputMode" | "autoCapitalize" | "autoCorrect" | "spellCheck" | "autoComplete"
+>;
+
+/**
+ * Defaults de teclado/entrada para móvil según el `type`. Centralizar aquí evita
+ * que cada formulario los repita y garantiza un comportamiento consistente en
+ * todas las páginas (el teclado correcto, sin autocapitalizar emails, etc.).
+ * Cualquier prop explícita en el call site sobrescribe estos defaults.
+ */
+function mobileDefaults(type: React.HTMLInputTypeAttribute | undefined): MobileDefaults {
+  switch (type) {
+    case "email":
+      return {
+        inputMode: "email",
+        autoCapitalize: "none",
+        autoCorrect: "off",
+        spellCheck: false,
+        autoComplete: "email",
+      };
+    case "tel":
+      return { inputMode: "tel", autoComplete: "tel" };
+    case "number":
+      return { inputMode: "decimal" };
+    case "password":
+      return { autoCapitalize: "none", autoCorrect: "off", spellCheck: false };
+    case "search":
+      return { inputMode: "search", autoCapitalize: "none", autoCorrect: "off" };
+    default:
+      return {};
+  }
+}
 
 export const Input = forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
->(({ className, ...props }, ref) => (
-  <input ref={ref} className={cn(controlBase, className)} {...props} />
+>(({ className, type, ...props }, ref) => (
+  <input
+    ref={ref}
+    type={type}
+    className={cn(controlBase, className)}
+    {...mobileDefaults(type)}
+    {...props}
+  />
 ));
 Input.displayName = "Input";
 

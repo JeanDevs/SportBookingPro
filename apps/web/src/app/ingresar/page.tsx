@@ -47,7 +47,7 @@ export default function CustomerLoginPage() {
     >
       <form onSubmit={submit} className="space-y-4">
         <Field label="Correo">
-          <Input type="email" autoComplete="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
         <Field label="Contraseña">
           <Input

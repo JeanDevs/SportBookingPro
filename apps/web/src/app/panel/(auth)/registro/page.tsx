@@ -47,7 +47,7 @@ export default function OwnerSignupPage() {
           <Input autoComplete="name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
         </Field>
         <Field label="Correo">
-          <Input type="email" autoComplete="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
         <Field label="Contraseña" hint="Mínimo 6 caracteres">
           <Input

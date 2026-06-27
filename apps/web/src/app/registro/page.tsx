@@ -54,7 +54,7 @@ export default function CustomerSignupPage() {
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Correo">
-            <Input type="email" autoComplete="email" inputMode="email" autoCapitalize="none" autoCorrect="off" spellCheck={false} required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </Field>
           <Field label="Teléfono">
             <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
