@@ -1,0 +1,73 @@
+%%{init: {'theme':'base','themeVariables':{'fontSize':'15px','fontFamily':'Helvetica','primaryColor':'#f3f6ee','primaryBorderColor':'#5b7d1a','lineColor':'#6b7280','clusterBkg':'#fafafa','clusterBorder':'#cbd5e1'}}}%%
+flowchart TB
+  subgraph USERS["Usuarios (navegador)"]
+    direction LR
+    OWNER["Dueno B2B"]
+    CUST["Cliente B2C"]
+    ANON["Anonimo"]
+  end
+
+  subgraph WEB["Next.js / Vercel  (apps/web)"]
+    direction TB
+    MW["Middleware 3 zonas<br/>publico | /cuenta | /panel<br/>lee account_type del JWT"]
+    subgraph ZP["Zona PUBLICA"]
+      HOME["/ marketplace"]
+      SLUG["/c/[slug] ficha + reserva"]
+      AUTHP["paginas de auth"]
+    end
+    subgraph ZC["Zona CLIENTE"]
+      CUENTA["/cuenta mis reservas"]
+    end
+    subgraph ZO["Zona DUENO  /panel"]
+      ONB["onboarding (wizard 3 pasos)"]
+      DASH["dashboard"]
+      RES["reservas"]
+      CAN["canchas"]
+      CLI["clientes"]
+      PAG["pagos"]
+      CFG["configuracion"]
+    end
+    SVC["Server Actions / services<br/>auth, facilities, fields, customers,<br/>reservations, payments, settings,<br/>dashboard, public-catalog,<br/>customer-auth, customer-bookings"]
+    SB["lib/supabase (ssr)<br/>sesion SOLO en cookies httpOnly"]
+  end
+
+  subgraph SUPA["Supabase"]
+    direction TB
+    AUTH["Auth (auth.users)<br/>trigger handle_new_user"]
+    subgraph PG["Postgres + RLS (owner_id = auth.uid)"]
+      direction LR
+      T1["users / customer_accounts"]
+      T2["facilities"]
+      T3["fields"]
+      T4["availability_rules / pricing_rules"]
+      T5["customers"]
+      T6["reservations<br/>anti-solape GiST"]
+      T7["payments"]
+      T8["status_history / audit_logs"]
+    end
+    RPC["RPCs SECURITY DEFINER<br/>public_facilities / public_facility /<br/>public_field_slots /<br/>create_customer_booking /<br/>submit_customer_payment_proof /<br/>my_customer_bookings"]
+    STO["Storage: payment-proofs"]
+    CRON["pg_cron: expiracion de holds"]
+  end
+
+  API["apps/api Fastify<br/>(scaffolding: solo modulo auth)"]:::muted
+
+  OWNER --> MW
+  CUST --> MW
+  ANON --> MW
+  MW --> ZP
+  MW --> ZC
+  MW --> ZO
+  ZP --> SVC
+  ZC --> SVC
+  ZO --> SVC
+  SVC --> SB
+  SB --> AUTH
+  SB -->|"RLS: dueno toca SUS tablas"| PG
+  SB -->|"lectura publica + escritura cliente"| RPC
+  ZC --> STO
+  RPC --> PG
+  AUTH -.->|"crea espejo"| T1
+  CRON --> T6
+
+  classDef muted fill:#f1f1f1,stroke:#9ca3af,color:#6b7280,stroke-dasharray:4 3;
