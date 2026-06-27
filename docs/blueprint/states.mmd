@@ -1,0 +1,18 @@
+%%{init: {'theme':'base','themeVariables':{'fontSize':'15px','fontFamily':'Helvetica','primaryColor':'#f3f6ee','primaryBorderColor':'#5b7d1a','lineColor':'#6b7280'}}}%%
+stateDiagram-v2
+  direction LR
+  [*] --> INTENT_CREATED: cliente inicia (portal)
+  [*] --> CONFIRMED: dueno crea directo (panel)
+  INTENT_CREATED --> AWAITING_DEPOSIT: create_customer_booking<br/>(hold con expires_at)
+  AWAITING_DEPOSIT --> EXPIRED: pg_cron / hold vencido
+  INTENT_CREATED --> EXPIRED: hold vencido
+  AWAITING_DEPOSIT --> CONFIRMED: dueno valida adelanto
+  AWAITING_DEPOSIT --> PARTIALLY_PAID: adelanto parcial
+  PARTIALLY_PAID --> CONFIRMED: completa adelanto
+  CONFIRMED --> PAID: valida saldo
+  PAID --> COMPLETED: jugado
+  CONFIRMED --> CANCELLED: cancela
+  AWAITING_DEPOSIT --> CANCELLED: rechazo / cancela
+  EXPIRED --> [*]: libera horario
+  CANCELLED --> [*]: libera horario
+  COMPLETED --> [*]
