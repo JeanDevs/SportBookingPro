@@ -31,8 +31,14 @@ export async function signUpCustomer({
   if (password.length < 6) return { error: 'La contraseña debe tener al menos 6 caracteres.' };
 
   const supabase = await createClient();
+
+  // B-4: limpia cualquier sesión previa (p. ej. un dueño logueado en el mismo
+  // navegador) para que la sesión resultante sea inequívocamente de cliente y el
+  // middleware no rebote al recién registrado fuera de /cuenta.
+  await supabase.auth.signOut();
+
   const { data, error } = await supabase.auth.signUp({
-    email,
+    email: email.trim().toLowerCase(),
     password,
     options: {
       data: {
@@ -55,7 +61,10 @@ export async function signUpCustomer({
 
 export async function signInCustomer(email: string, password: string): Promise<AuthResult> {
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
+  });
   if (error) return { error: 'Credenciales inválidas.' };
   return { error: null };
 }

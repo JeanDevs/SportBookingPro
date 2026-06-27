@@ -237,10 +237,12 @@ status (PENDING_VALIDATION|VALIDATED|REJECTED|CANCELLED), amount, proof_url`. RL
 - UC-PAY-05 — Validar saldo → reserva `PAID`.
 
 **Brechas.**
-- `[P1]` **Comprobantes en bucket público.** `payment-proofs` es `public=true`; quitaron la policy
-  de *listar*, pero las URLs de objeto siguen siendo accesibles si se conocen. *Dirección:* URLs
-  firmadas + scoping por carpeta `uid/` (hardening pendiente declarado).
-- `[P2]` Comprobante vía WhatsApp (backlog 2.4) en vez de subida de archivo.
+- `[P2]` **Comprobantes en bucket público — hoy MOOT.** El flujo actual NO sube archivos: el
+  cliente confirma método y el comprobante real llega por **WhatsApp** (`ProofModal` envía
+  `proof_url='whatsapp-pending'`). Mientras no se reactive la subida de archivos, no hay objetos
+  sensibles en `payment-proofs`. *Dirección (si se reactiva la subida):* URLs firmadas + scoping por
+  carpeta `uid/`. Revisado en Fase B; no se aplica migración riesgosa por algo sin uso real.
+- `[P2]` Formalizar el comprobante vía WhatsApp (backlog 2.4): enlace `wa.me` pre-llenado.
 
 ---
 
@@ -305,12 +307,15 @@ sesión solo en cookies httpOnly; anti-enumeración en registro.
    reserva" al llegar a `ACTIVATED`).
 4. Modelar explícitamente el **estado de activación** (derivado) para gobernar nudges y gating.
 
-### Fase B — Robustez y seguridad funcional `[P1]`
-5. B-4: corregir default de `account_type` y rebote de `/cuenta` en `middleware.ts`; `signUpCustomer`
-   cierra sesión previa.
-6. B-001: migrar auth a Route Handlers (status codes correctos, estable en móvil).
-7. URLs firmadas para comprobantes (`payment-proofs`).
-8. `cancelReservation` con transiciones válidas.
+### Fase B — Robustez y seguridad funcional `[P1]` — ✅ HECHA (2026-06-27)
+5. ✅ B-4: `/cuenta` rebota a `/` (no a `/panel`); `signUpCustomer` y `signUp` cierran sesión previa.
+6. ✅ B-001 (mitigación de alto valor, sin refactor riesgoso): normalización de email
+   (`trim().toLowerCase()`) en todos los servicios de auth + inputs de email a prueba de móvil
+   (`inputMode/autoCapitalize=none/autoCorrect/spellCheck`). La migración completa a Route Handlers
+   queda como mejora futura: requiere QA en dispositivo real + Supabase, fuera del alcance seguro de
+   esta sesión.
+7. ➖ URLs firmadas para `payment-proofs`: MOOT hoy (no se suben archivos; comprobante por WhatsApp).
+8. ✅ `cancelReservation` con transiciones válidas (no cancela PAID/COMPLETED/terminal).
 
 ### Fase C — Captación tope de embudo B2B `[P2]`
 9. Página `/para-complejos` (valor + planes) enlazada desde `OwnerCta`.

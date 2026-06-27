@@ -21,7 +21,12 @@ export interface SignUpInput {
 export async function signIn(email: string, password: string): Promise<AuthResult> {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  // Normaliza el email: en móvil el teclado suele capitalizar la inicial o dejar
+  // un espacio final, lo que rompe el login con credenciales por lo demás válidas.
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
+  });
 
   if (error) {
     return { error: 'Credenciales invalidas.' };
@@ -37,8 +42,12 @@ export async function signIn(email: string, password: string): Promise<AuthResul
 export async function signUp({ email, password, fullName }: SignUpInput): Promise<AuthResult> {
   const supabase = await createClient();
 
+  // Limpia sesión previa (evita arrastrar una cuenta de cliente al alta de dueño)
+  // y normaliza el email para evitar fallos por mayúsculas/espacios en móvil.
+  await supabase.auth.signOut();
+
   const { data, error } = await supabase.auth.signUp({
-    email,
+    email: email.trim().toLowerCase(),
     password,
     options: {
       data: { full_name: fullName, account_type: 'owner' },
@@ -76,7 +85,10 @@ export async function resetPassword(email: string): Promise<AuthResult> {
   const options = appUrl
     ? { redirectTo: `${appUrl}/auth/callback?next=/panel/actualizar-clave` }
     : undefined;
-  const { error } = await supabase.auth.resetPasswordForEmail(email, options);
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    email.trim().toLowerCase(),
+    options,
+  );
 
   if (error) {
     return { error: 'No se pudo enviar el email de recuperacion.' };

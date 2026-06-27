@@ -89,7 +89,10 @@ export async function middleware(request: NextRequest) {
   // ----- Zona CLIENTE -----
   if (pathname === '/cuenta' || pathname.startsWith('/cuenta/')) {
     if (!user) return redirectTo('/ingresar');
-    if (accountType !== 'customer') return redirectTo('/panel');
+    // B-4: un no-cliente (dueño o sesión sin tipo) va al sitio público, NUNCA al
+    // panel del dueño. Antes el rebote a /panel depositaba a clientes recién
+    // registrados en el panel admin del primer complejo.
+    if (accountType !== 'customer') return redirectTo('/');
     return supabaseResponse;
   }
 

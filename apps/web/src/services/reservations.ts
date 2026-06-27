@@ -222,12 +222,36 @@ export async function createReservation(
   return { error: null };
 }
 
+/** Estados desde los que una reserva puede cancelarse. Una reserva ya pagada
+ * (PAID), jugada (COMPLETED) o en estado terminal (CANCELLED/EXPIRED) no se
+ * cancela desde aquí: PAID requeriría política de reembolso (no definida). */
+const CANCELLABLE_STATUSES: ReservationStatus[] = [
+  'INTENT_CREATED',
+  'AWAITING_DEPOSIT',
+  'PARTIALLY_PAID',
+  'CONFIRMED',
+];
+
 export async function cancelReservation(id: string): Promise<{ error: string | null }> {
   const supabase = await createClient();
+
+  const { data: current } = await supabase
+    .from('reservations')
+    .select('status')
+    .eq('id', id)
+    .maybeSingle();
+  if (!current) return { error: 'No se encontró la reserva.' };
+  if (!CANCELLABLE_STATUSES.includes(current.status as ReservationStatus)) {
+    return { error: 'Esta reserva ya no se puede cancelar.' };
+  }
+
+  // El filtro por estado evita una cancelación en carrera si el estado cambió
+  // entre la lectura y la escritura (RLS ya limita la fila a una reserva propia).
   const { error } = await supabase
     .from('reservations')
     .update({ status: 'CANCELLED', cancelled_at: new Date().toISOString() })
-    .eq('id', id);
+    .eq('id', id)
+    .in('status', CANCELLABLE_STATUSES);
   if (error) return { error: 'No se pudo cancelar la reserva.' };
   return { error: null };
 }
