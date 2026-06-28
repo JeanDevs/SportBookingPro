@@ -89,7 +89,7 @@ export function ReservasView({ date, reservations, fields, customers }: Reservas
                 type="date"
                 value={date}
                 onChange={(e) => e.target.value && go(e.target.value)}
-                className="h-10 border-x border-ink-700 bg-transparent px-2 text-sm text-ink-100 outline-none"
+                className="h-10 border-x border-ink-700 bg-transparent px-2 text-base sm:text-sm text-ink-100 outline-none"
               />
               <button
                 onClick={() => go(shiftDate(date, 1))}

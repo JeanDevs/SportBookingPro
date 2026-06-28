@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 
@@ -27,6 +27,23 @@ export const metadata: Metadata = {
   },
   description:
     "Reserva canchas deportivas en segundos y gestiona tu complejo: reservas, pagos y clientes en un solo lugar.",
+  applicationName: "SportBook Pro",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "SportBook Pro" },
+  formatDetection: { telephone: false },
+};
+
+/**
+ * Configuración mobile a nivel de app. `viewport-fit=cover` + `themeColor` oscuro
+ * integran la barra del navegador móvil con el tema dark; `maximumScale: 5`
+ * mantiene el zoom accesible (no lo bloqueamos). `initialScale: 1` evita el zoom
+ * inesperado al enfocar inputs en iOS.
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#0a0f0a",
 };
 
 type RootLayoutProps = {
