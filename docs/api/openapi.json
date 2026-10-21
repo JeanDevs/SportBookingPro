@@ -1,0 +1,409 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SportBook Pro API",
+    "version": "0.1.0",
+    "description": "API y endpoints HTTP de SportBook Pro: plataforma SaaS para la gestión de canchas deportivas (reservas, pagos y reportes).\n\n**Autenticación:** Supabase Auth. La API Fastify acepta `Authorization: Bearer <access_token>` o la cookie de sesión `sb-<ref>-auth-token`; la app web usa únicamente la cookie httpOnly."
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Access token de Supabase Auth."
+      },
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sb-<ref>-auth-token",
+        "description": "Cookie httpOnly de sesión que escribe `@supabase/ssr`."
+      }
+    },
+    "schemas": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Estado del servicio",
+        "tags": [
+          "Sistema"
+        ],
+        "description": "Responde 200 si la API está arriba. No requiere autenticación.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok",
+                    "service",
+                    "timestamp"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "service": {
+                      "type": "string",
+                      "example": "app-deporte-api"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Perfil del usuario autenticado",
+        "tags": [
+          "Autenticación"
+        ],
+        "description": "Valida el token de Supabase y devuelve el perfil del propietario leído de `public.users`.",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "email",
+                    "fullName",
+                    "role"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "fullName": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "role": {
+                      "type": "string",
+                      "example": "OWNER"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente, inválido o vencido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Token ausente, inválido o vencido.",
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "El usuario no tiene perfil de propietario.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "El usuario no tiene perfil de propietario.",
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/reportes/exportar": {
+      "servers": [
+        {
+          "url": "http://localhost:3000",
+          "description": "App web Next.js (local)"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Exportar un reporte a PDF, Excel o CSV",
+        "description": "Genera el reporte del complejo del propietario autenticado y lo devuelve como descarga. Los datos se filtran por RLS (`owner_id = auth.uid()`). El formato se resuelve con `ExporterFactory` (patrón Strategy + Factory). Rango máximo: 366 días.",
+        "operationId": "exportarReporte",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tipo",
+            "in": "query",
+            "required": true,
+            "description": "Tipo de reporte.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "reservas",
+                "ingresos",
+                "clientes"
+              ]
+            }
+          },
+          {
+            "name": "formato",
+            "in": "query",
+            "required": true,
+            "description": "Formato de salida.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pdf",
+                "xlsx",
+                "csv"
+              ]
+            }
+          },
+          {
+            "name": "desde",
+            "in": "query",
+            "required": true,
+            "description": "Fecha inicial (hora de Lima), inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-10-01"
+            }
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": true,
+            "description": "Fecha final (hora de Lima), inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-10-31"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo del reporte. `Content-Disposition: attachment; filename=\"reporte-<tipo>-<desde>_<hasta>.<ext>\"`.",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"reporte-ingresos-2026-10-01_2026-10-31.pdf\""
+                }
+              }
+            },
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros inválidos (tipo, formato o rango de fechas).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Inicia sesión para exportar reportes."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sin sesión.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Inicia sesión para exportar reportes."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "La cuenta es de cliente; solo el dueño exporta reportes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Inicia sesión para exportar reportes."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Falló la generación del archivo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Inicia sesión para exportar reportes."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/callback": {
+      "servers": [
+        {
+          "url": "http://localhost:3000",
+          "description": "App web Next.js (local)"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Callback de autenticación (PKCE)",
+        "description": "Intercambia el `code` que envía Supabase (confirmación de correo o recuperación de contraseña) por una sesión en cookies httpOnly y redirige a `next`. Si falla, redirige a la pantalla de ingreso con `?error=auth`.",
+        "operationId": "authCallback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "description": "Código PKCE emitido por Supabase Auth.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "next",
+            "in": "query",
+            "required": false,
+            "description": "Ruta interna de destino (debe empezar con `/`). Por defecto `/`.",
+            "schema": {
+              "type": "string",
+              "example": "/panel/actualizar-clave"
+            }
+          }
+        ],
+        "responses": {
+          "307": {
+            "description": "Redirección: a `next` si el intercambio fue exitoso; a `/panel/ingresar?error=auth` o `/ingresar?error=auth` si no.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3002",
+      "description": "API Fastify (local)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Sistema",
+      "description": "Estado del servicio."
+    },
+    {
+      "name": "Autenticación",
+      "description": "Sesión y perfil del usuario."
+    },
+    {
+      "name": "Reportes",
+      "description": "Reportes exportables (PDF, Excel, CSV)."
+    }
+  ]
+}
