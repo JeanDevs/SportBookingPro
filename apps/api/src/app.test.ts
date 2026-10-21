@@ -52,4 +52,29 @@ describe('API app-deporte', () => {
       expect(res.json().message).toBe('No autenticado.');
     });
   });
+
+  describe('Swagger / OpenAPI', () => {
+    it('sirve la UI en /docs', async () => {
+      const res = await app.inject({ method: 'GET', url: '/docs' });
+      // swagger-ui redirige /docs → /docs/ y sirve el HTML en la ruta con barra.
+      const ui = res.statusCode === 302 ? await app.inject({ method: 'GET', url: '/docs/' }) : res;
+      expect(ui.statusCode).toBe(200);
+      expect(ui.headers['content-type']).toContain('text/html');
+    });
+
+    it('documenta las rutas Fastify y los endpoints de la app web', async () => {
+      const res = await app.inject({ method: 'GET', url: '/docs/json' });
+      expect(res.statusCode).toBe(200);
+      const spec = res.json();
+      expect(spec.openapi).toBe('3.0.3');
+      expect(spec.info.title).toBe('SportBook Pro API');
+      expect(Object.keys(spec.paths)).toEqual(
+        expect.arrayContaining(['/health', '/auth/me', '/panel/reportes/exportar', '/auth/callback']),
+      );
+      expect(spec.paths['/auth/me'].get.security).toEqual([{ bearerAuth: [] }, { cookieAuth: [] }]);
+      expect(spec.components.securitySchemes.bearerAuth.scheme).toBe('bearer');
+      const exportParams = spec.paths['/panel/reportes/exportar'].get.parameters.map((p: { name: string }) => p.name);
+      expect(exportParams).toEqual(['tipo', 'formato', 'desde', 'hasta']);
+    });
+  });
 });
