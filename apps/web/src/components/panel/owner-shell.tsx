@@ -9,6 +9,7 @@ import {
   Goal,
   Users,
   Wallet,
+  FileChartColumn,
   Settings,
   LogOut,
   Menu,
@@ -25,6 +26,7 @@ const NAV = [
   { label: "Canchas", href: "/panel/canchas", icon: Goal },
   { label: "Clientes", href: "/panel/clientes", icon: Users },
   { label: "Pagos", href: "/panel/pagos", icon: Wallet },
+  { label: "Reportes", href: "/panel/reportes", icon: FileChartColumn },
   { label: "Configuración", href: "/panel/configuracion", icon: Settings },
 ];
 
