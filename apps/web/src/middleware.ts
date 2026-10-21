@@ -68,6 +68,9 @@ export async function middleware(request: NextRequest) {
   // ----- Zona DUEÑO -----
   if (pathname === '/panel' || pathname.startsWith('/panel/')) {
     if (OWNER_AUTH_PAGES.includes(pathname)) {
+      // Tras el enlace de recuperación ya hay sesión (PKCE): el dueño debe poder ver el
+      // formulario de nueva contraseña en vez de ser enviado a /panel.
+      if (pathname === '/panel/actualizar-clave') return supabaseResponse;
       if (user && accountType === 'owner') return redirectTo('/panel');
       return supabaseResponse;
     }
